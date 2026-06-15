@@ -3,6 +3,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import type * as s3 from 'aws-cdk-lib/aws-s3';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import type { KeycloakCluster } from '../../../database/keycloak-cluster/keycloak-cluster.js';
@@ -38,7 +39,7 @@ export class KeycloakTaskDefinition extends Construct {
       'TaskDefinition',
       {
         cpu: 512,
-        memoryLimitMiB: 1024,
+        memoryLimitMiB: cdk.Size.gibibytes(1).toMebibytes(),
         taskRole,
       }
     );
@@ -106,12 +107,19 @@ export class KeycloakTaskDefinition extends Construct {
     return container;
   }
 
-  private addKeycloakContainer(
+  private addKeycloakContainer = (
     databaseCluster: KeycloakCluster,
     hostname: string,
     initContainer: ecs.ContainerDefinition,
     logGroup: logs.ILogGroup
-  ): void {
+  ) => {
+    const adminSecret = new secretsmanager.Secret(this, 'AdminSecret', {
+      generateSecretString: {
+        excludePunctuation: true,
+        passwordLength: 32,
+      },
+    });
+
     const { hostname: databaseHostname, port: databasePort } =
       databaseCluster.clusterEndpoint();
     const databaseSecret = databaseCluster.secret();
@@ -120,11 +128,13 @@ export class KeycloakTaskDefinition extends Construct {
       command: ['start'],
       environment: {
         KC_BOOTSTRAP_ADMIN_USERNAME: 'admin',
+        KC_CACHE: 'local',
         KC_DB: 'postgres',
         KC_DB_URL_DATABASE: 'keycloak',
         KC_DB_URL_HOST: databaseHostname,
         KC_DB_URL_PORT: databasePort.toString(),
         KC_DB_USERNAME: 'keycloak',
+        KC_HEALTH_ENABLED: 'true',
         KC_HOSTNAME: hostname,
         KC_HTTP_ENABLED: 'true',
         KC_HTTPS_CERTIFICATE_FILE: `${this.certsMountPath}/upstream.cert.pem`,
@@ -137,12 +147,13 @@ export class KeycloakTaskDefinition extends Construct {
         logGroup,
         streamPrefix: 'keycloak',
       }),
-      portMappings: [{ containerPort: 8080 }, { containerPort: 8443 }],
+      portMappings: [
+        { containerPort: 8080 },
+        { containerPort: 8443 },
+        { containerPort: 9000 },
+      ],
       secrets: {
-        KC_BOOTSTRAP_ADMIN_PASSWORD: ecs.Secret.fromSecretsManager(
-          databaseSecret,
-          'password'
-        ),
+        KC_BOOTSTRAP_ADMIN_PASSWORD: ecs.Secret.fromSecretsManager(adminSecret),
         KC_DB_PASSWORD: ecs.Secret.fromSecretsManager(
           databaseSecret,
           'password'
@@ -160,5 +171,13 @@ export class KeycloakTaskDefinition extends Construct {
       condition: ecs.ContainerDependencyCondition.SUCCESS,
       container: initContainer,
     });
-  }
+
+    NagSuppressions.addResourceSuppressions(adminSecret, [
+      {
+        id: 'AwsSolutions-SMG4',
+        reason:
+          'Automatic secret rotation is disabled because this is not a production workload.',
+      },
+    ]);
+  };
 }

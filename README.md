@@ -153,7 +153,7 @@ task startup, so the cert and key must be in place before deploying
 ```bash
 BUCKET=$(aws resourcegroupstaggingapi get-resources \
   --resource-type-filters s3 \
-  --tag-filters Key=Name,Value=KeycloakCertificates \
+  --tag-filters Key=Name,Values=KeycloakCertificates \
   --query "ResourceTagMappingList[0].ResourceARN" \
   --output text | sed 's|arn:aws:s3:::||')
 
@@ -225,7 +225,7 @@ synthesis. Synthesis fails on any unaddressed violation.
 | `AwsSolutions-ECS4`  | `KeycloakEcsCluster`         | CloudWatch Container Insights disabled to reduce cost.                                                    |
 | `AwsSolutions-IAM5`  | `KeycloakTaskDefinition`     | Task role needs read access to all objects in the certificates bucket.                                    |
 | `AwsSolutions-ECS2`  | `KeycloakTaskDefinition`     | Non-sensitive Keycloak config (DB URL, port, TLS paths) passed as plaintext. Secrets use Secrets Manager. |
-| `AwsSolutions-EC23`  | `KeycloakFargateService`     | cdk-nag cannot evaluate the VPC CIDR token at synthesis time. Rules restrict to VPC CIDR only.            |
+| `AwsSolutions-EC23`  | `KeycloakNlb`                | NLB is internet-facing and must accept inbound HTTPS traffic on port 443 from any IP.                     |
 | `AwsSolutions-ELB2`  | `KeycloakNlb`                | NLB access logs disabled to reduce cost.                                                                  |
 | `AwsSolutions-RDS6`  | `KeycloakCluster`            | IAM authentication disabled; Keycloak requires username/password.                                         |
 | `AwsSolutions-RDS10` | `KeycloakCluster`            | Deletion protection disabled for non-production workload.                                                 |

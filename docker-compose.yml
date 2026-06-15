@@ -14,9 +14,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    # Optional: only needed if you want to inspect the DB from the host.
-    ports:
-      - "5432:5432"
 
   upstream:
     image: quay.io/keycloak/keycloak:26.6.1
@@ -27,6 +24,7 @@ services:
       KC_DB_URL: jdbc:postgresql://postgres-upstream:5432/${DB}
       KC_DB_USERNAME: ${DB_USERNAME}
       KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_HEALTH_ENABLED: 'true'
 
       # Required on first boot against an empty DB. Safe to remove once the
       # admin user is persisted in Postgres.
@@ -48,6 +46,7 @@ services:
     ports:
       - "8080:8080"   # HTTP — fallback for admin if you botch TLS
       - "8443:8443"   # HTTPS — serves the self-signed cert
+      - "9000:9000"   # Health check
     depends_on:
       postgres-upstream:
         condition: service_healthy
@@ -87,6 +86,7 @@ services:
 
       KC_HOSTNAME: https://downstream:9443
       KC_HTTP_ENABLED: "true"
+
       # The truststore import — downstream trusts upstream's self-signed cert
       # for the back-channel call. This is the literal manual step that a real
       # CA would make automatic.

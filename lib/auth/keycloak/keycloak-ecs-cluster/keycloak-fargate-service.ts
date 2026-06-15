@@ -1,6 +1,6 @@
+import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
-import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import type { KeycloakCluster } from '../../../database/keycloak-cluster/keycloak-cluster.js';
 import type { KeycloakVpc } from '../../../network/keycloak-vpc/keycloak-vpc.js';
@@ -13,7 +13,7 @@ interface KeycloakFargateServiceProps {
 }
 
 export class KeycloakFargateService extends Construct {
-  readonly service: ecs.FargateService;
+  readonly loadBalancerTarget: ecs.IEcsLoadBalancerTarget;
   readonly serviceSecurityGroup: ec2.SecurityGroup;
 
   constructor(
@@ -23,35 +23,34 @@ export class KeycloakFargateService extends Construct {
   ) {
     super(scope, id);
 
-    const { cluster, databaseCluster, networkVpc, taskDefinition } = props;
+    const {
+      cluster,
+      databaseCluster,
+      networkVpc: { publicSubnets, vpc },
+      taskDefinition,
+    } = props;
 
-    this.serviceSecurityGroup = new ec2.SecurityGroup(
-      this,
-      'TaskSecurityGroup',
-      {
-        vpc: networkVpc.vpc,
-      }
-    );
+    this.serviceSecurityGroup = new ec2.SecurityGroup(this, 'SecurityGroup', {
+      vpc,
+    });
 
-    this.service = new ecs.FargateService(this, 'FargateService', {
+    const service = new ecs.FargateService(this, 'FargateService', {
       assignPublicIp: true,
       circuitBreaker: { rollback: true },
       cluster,
       desiredCount: 1,
+      healthCheckGracePeriod: cdk.Duration.minutes(3),
       minHealthyPercent: 0,
       securityGroups: [this.serviceSecurityGroup],
       taskDefinition,
-      vpcSubnets: { subnets: [...networkVpc.publicSubnets] },
+      vpcSubnets: { subnets: [...publicSubnets] },
+    });
+
+    this.loadBalancerTarget = service.loadBalancerTarget({
+      containerName: 'keycloak',
+      containerPort: 8443,
     });
 
     databaseCluster.allowIngressFrom(this.serviceSecurityGroup);
-
-    NagSuppressions.addResourceSuppressions(this.serviceSecurityGroup, [
-      {
-        id: 'AwsSolutions-EC23',
-        reason:
-          'cdk-nag cannot evaluate the VPC CIDR block (Fn::GetAtt intrinsic function) at synthesis time. The security group restricts inbound access to specific ports from the VPC CIDR only.',
-      },
-    ]);
   }
 }

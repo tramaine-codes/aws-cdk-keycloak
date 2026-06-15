@@ -35,17 +35,13 @@ export class Keycloak extends Construct {
       }
     );
 
-    const { service, serviceSecurityGroup } = new KeycloakFargateService(
-      this,
-      'KeycloakFargateService',
-      {
-        cluster,
-        databaseCluster,
-        networkVpc,
-        taskDefinition,
-      }
-    );
+    const service = new KeycloakFargateService(this, 'KeycloakFargateService', {
+      cluster,
+      databaseCluster,
+      networkVpc,
+      taskDefinition,
+    });
 
-    nlb.addTarget(service, serviceSecurityGroup);
+    nlb.addKeycloakTarget(service);
   }
 }
