@@ -10,6 +10,7 @@ export class KeycloakCertificatesBucket extends Construct {
     super(scope, id);
 
     this.bucket = new s3.Bucket(this, 'Bucket', {
+      autoDeleteObjects: true,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
       enforceSSL: true,
