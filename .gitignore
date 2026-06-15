@@ -1,0 +1,11 @@
+.DS_Store
+.env
+
+certs
+coverage
+node_modules
+secrets
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out

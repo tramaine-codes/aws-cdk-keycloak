@@ -1,0 +1,107 @@
+name: keycloak
+
+services:
+  postgres-upstream:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DB}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_upstream_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Optional: only needed if you want to inspect the DB from the host.
+    ports:
+      - "5432:5432"
+
+  upstream:
+    image: quay.io/keycloak/keycloak:26.6.1
+    command: start
+    environment:
+      KC_CACHE: local
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-upstream:5432/${DB}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+
+      # Required on first boot against an empty DB. Safe to remove once the
+      # admin user is persisted in Postgres.
+      # KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
+      # KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+
+      # Self-signed PEM cert/key, mounted read-only below.
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/upstream.cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/upstream.key.pem
+
+      # Enforced in `start` mode: this is the frontend/issuer URL and must
+      # match the cert SAN.
+      KC_HOSTNAME: https://upstream:8443
+
+      # Lock-out safety net during bring-up. Delete once TLS is solid.
+      KC_HTTP_ENABLED: "true"
+    volumes:
+      - ./certs:/opt/keycloak/conf/certs:ro
+    ports:
+      - "8080:8080"   # HTTP — fallback for admin if you botch TLS
+      - "8443:8443"   # HTTPS — serves the self-signed cert
+    depends_on:
+      postgres-upstream:
+        condition: service_healthy
+
+  postgres-downstream:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DB}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_downstream_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  downstream:
+    image: quay.io/keycloak/keycloak:26.6.1
+    command: start
+    environment:
+      KC_CACHE: local
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-downstream:5432/${DB}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+
+      # Required on first boot against an empty DB. Safe to remove once the
+      # admin user is persisted in Postgres.
+      # KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
+      # KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+
+      # Self-signed PEM cert/key, mounted read-only below.
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/downstream.cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/downstream.key.pem
+
+      KC_HOSTNAME: https://downstream:9443
+      KC_HTTP_ENABLED: "true"
+      # The truststore import — downstream trusts upstream's self-signed cert
+      # for the back-channel call. This is the literal manual step that a real
+      # CA would make automatic.
+      KC_TRUSTSTORE_PATHS: /opt/keycloak/conf/truststore
+    volumes:
+      - ./certs/downstream.cert.pem:/opt/keycloak/conf/certs/downstream.cert.pem:ro
+      - ./certs/downstream.key.pem:/opt/keycloak/conf/certs/downstream.key.pem:ro
+      - ./certs/upstream.cert.pem:/opt/keycloak/conf/truststore/upstream.cert.pem:ro
+    ports:
+      - "9443:8443"
+      - "9080:8080"
+    depends_on:
+      postgres-downstream:
+        condition: service_healthy
+
+volumes:
+  postgres_upstream_data:
+  postgres_downstream_data:

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git status*)",
+      "Bash(npm run build)",
+      "Bash(npm run build:ci)",
+      "Bash(npm run lint)",
+      "Bash(npm test)",
+      "Bash(npx cdk diff*)",
+      "Bash(npx cdk synth*)"
+    ]
+  }
+}

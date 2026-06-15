@@ -1,0 +1,59 @@
+{
+  "bin": {
+    "aws-cdk-keycloak": "bin/aws-cdk-keycloak.js"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.259.0",
+    "constructs": "10.6.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.0",
+    "@commitlint/cli": "21.0.2",
+    "@commitlint/config-conventional": "21.0.2",
+    "@types/node": "24.13.2",
+    "@vitest/coverage-v8": "4.1.8",
+    "aws-cdk": "2.1126.0",
+    "cdk-nag": "2.38.2",
+    "del-cli": "7.0.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.0.7",
+    "prettier": "3.8.4",
+    "tsx": "4.22.4",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
+  },
+  "engines": {
+    "node": "24.16.0",
+    "npm": "11.17.0"
+  },
+  "homepage": "https://github.com/tramaine-codes/aws-cdk-keycloak",
+  "name": "aws-cdk-keycloak",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tramaine-codes/aws-cdk-keycloak.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:ci": "npm run clean && npm test && tsc",
+    "cdk": "cdk",
+    "clean": "del-cli coverage",
+    "format": "biome format --fix --no-errors-on-unmatched .",
+    "lint": "biome lint --no-errors-on-unmatched .",
+    "lint:fix": "biome lint --fix --no-errors-on-unmatched .",
+    "prepare": "husky",
+    "test": "vitest run --dir test/unit --config ./vite.config.unit.ts",
+    "test:cov": "vitest run --coverage --dir test/unit --config ./vite.config.unit.ts",
+    "test:watch": "vitest --dir test/unit --config ./vite.config.unit.ts",
+    "watch": "tsc -w"
+  },
+  "type": "module",
+  "version": "0.1.0",
+  "volta": {
+    "node": "24.16.0",
+    "npm": "11.17.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true
+  }
+}
