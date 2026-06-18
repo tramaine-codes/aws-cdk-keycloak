@@ -3,7 +3,7 @@
     "aws-cdk-keycloak": "bin/aws-cdk-keycloak.js"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.259.0",
+    "aws-cdk-lib": "2.260.0",
     "constructs": "10.6.0"
   },
   "devDependencies": {
@@ -11,8 +11,8 @@
     "@commitlint/cli": "21.0.2",
     "@commitlint/config-conventional": "21.0.2",
     "@types/node": "24.13.2",
-    "@vitest/coverage-v8": "4.1.8",
-    "aws-cdk": "2.1126.0",
+    "@vitest/coverage-v8": "4.1.9",
+    "aws-cdk": "2.1128.0",
     "cdk-nag": "2.38.2",
     "del-cli": "7.0.0",
     "husky": "9.1.7",
@@ -20,7 +20,7 @@
     "prettier": "3.8.4",
     "tsx": "4.22.4",
     "typescript": "6.0.3",
-    "vitest": "4.1.8"
+    "vitest": "4.1.9"
   },
   "engines": {
     "node": "24.16.0",
