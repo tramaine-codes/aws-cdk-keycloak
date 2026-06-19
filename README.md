@@ -109,6 +109,8 @@ lib/
     keycloak-cluster/       # Aurora PostgreSQL Serverless v2
   network/                  # NetworkStack
     keycloak-vpc/           # VPC, subnets
+scripts/
+  upload-certs.ts           # Upload certs/ to the Keycloak certificates bucket
 test/
   unit/                     # Vitest unit tests
     network/
@@ -150,15 +152,16 @@ The init container syncs the entire certificates bucket into the container at
 task startup, so the cert and key must be in place before deploying
 `Keycloak-AuthenticationStack`.
 
-```bash
-BUCKET=$(aws resourcegroupstaggingapi get-resources \
-  --resource-type-filters s3 \
-  --tag-filters Key=Name,Values=KeycloakCertificates \
-  --query "ResourceTagMappingList[0].ResourceARN" \
-  --output text | sed 's|arn:aws:s3:::||')
+Set AWS credentials as environment variables, then run the upload script. It
+discovers the bucket by its `keycloak:name` tag and uploads every file in
+`certs/`.
 
-aws s3 cp certs/upstream.cert.pem s3://$BUCKET/
-aws s3 cp certs/upstream.key.pem s3://$BUCKET/
+```bash
+export AWS_ACCESS_KEY_ID=...
+export AWS_SECRET_ACCESS_KEY=...
+export AWS_SESSION_TOKEN=...   # if using temporary credentials
+
+npx tsx scripts/upload-certs.ts
 ```
 
 **5. Deploy the authentication stack**

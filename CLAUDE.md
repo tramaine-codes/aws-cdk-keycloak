@@ -35,6 +35,12 @@ TypeScript via `tsx` (no compile step needed at runtime).
       logging bucket managed internally)
     - **`lib/pipeline/delivery-pipeline/`** — `DeliveryPipeline` construct
   - **`lib/repository/`** — `RepositoryStack`
+- **`scripts/`** — Operational scripts run outside CDK.
+  - **`scripts/upload-certs.ts`** — Discovers the Keycloak certificates bucket
+    by its `keycloak:name` tag and uploads all files from `certs/`. Requires AWS
+    credentials via environment variables (`AWS_ACCESS_KEY_ID`,
+    `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`). Run with
+    `npx tsx scripts/upload-certs.ts`.
 - **`test/unit/`** — Vitest unit tests. CDK stack assertions use
   `aws-cdk-lib/assertions` (`Template.fromStack`).
 
