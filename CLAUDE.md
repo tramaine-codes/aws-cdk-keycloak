@@ -49,8 +49,10 @@ The CDK CLI runs the app via `npx tsx` (configured in `cdk.json`).
 
 ## Tooling
 
-- **Linter/Formatter**: [Biome](https://biomejs.dev/) (not ESLint/Prettier).
-  Single quotes, 2-space indent, trailing commas (ES5), 80-char line width.
+- **Linter/Formatter**: [Biome](https://biomejs.dev/) (not ESLint) for `*.js`,
+  `*.json`, and `*.ts` files. Single quotes, 2-space indent, trailing commas
+  (ES5), 80-char line width. [Prettier](https://prettier.io/) for `*.md` files
+  (config in `prettier.config.js`).
 - **Test runner**: Vitest (not Jest). Config is in `vite.config.unit.ts`. Tests
   live in `test/unit/`.
 - **Security checks**: [cdk-nag](https://github.com/cdklabs/cdk-nag) with
@@ -64,7 +66,8 @@ The CDK CLI runs the app via `npx tsx` (configured in `cdk.json`).
   config in `.ncurc.cjs`. Targets latest versions for all packages except
   `@types/node`, which is pinned to minor updates only.
 - **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and
-  `lint-staged` (biome format + lint on staged files).
+  `lint-staged` (biome format + lint on staged `*.js`/`*.json`/`*.ts` files;
+  prettier format on staged `*.md` files).
 
 ## Commands
 

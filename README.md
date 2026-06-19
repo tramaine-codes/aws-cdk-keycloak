@@ -238,7 +238,8 @@ synthesis. Synthesis fails on any unaddressed violation.
 ## CI
 
 The pre-commit hook runs `npm run build:ci` (clean → test → type-check) and
-`lint-staged` (Biome format + lint on staged files) automatically via Husky.
+`lint-staged` (Biome format + lint on staged `*.js`/`*.json`/`*.ts` files;
+Prettier format on staged `*.md` files) automatically via Husky.
 
 ```bash
 # Full CI build
@@ -252,7 +253,8 @@ npm run build:ci
 | [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/) | Infrastructure as code                        |
 | [TypeScript](https://www.typescriptlang.org/)           | Language (type-check only; runtime via `tsx`) |
 | [Vitest](https://vitest.dev/)                           | Unit test runner                              |
-| [Biome](https://biomejs.dev/)                           | Linter and formatter                          |
+| [Biome](https://biomejs.dev/)                           | Linter and formatter for JS/JSON/TS           |
+| [Prettier](https://prettier.io/)                        | Formatter for Markdown                        |
 | [cdk-nag](https://github.com/cdklabs/cdk-nag)           | CDK security and compliance checks            |
 | [Husky](https://typicode.github.io/husky/)              | Git hooks                                     |
 | [commitlint](https://commitlint.js.org/)                | Conventional Commits enforcement              |
