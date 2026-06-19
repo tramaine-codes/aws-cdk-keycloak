@@ -3,8 +3,13 @@
     "aws-cdk-keycloak": "bin/aws-cdk-keycloak.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1072.0",
+    "@aws-sdk/credential-providers": "3.1072.0",
+    "@aws-sdk/lib-storage": "3.1072.0",
     "aws-cdk-lib": "2.260.0",
-    "constructs": "10.6.0"
+    "constructs": "10.6.0",
+    "effect": "4.0.0-beta.84",
+    "package-directory": "8.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.0",
@@ -54,6 +59,8 @@
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
-    "fsevents@2.3.3": true
+    "fsevents@2.3.3": true,
+    "effect@4.0.0-beta.84": true,
+    "msgpackr-extract@3.0.4": true
   }
 }

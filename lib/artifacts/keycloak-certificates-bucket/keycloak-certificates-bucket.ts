@@ -18,7 +18,7 @@ export class KeycloakCertificatesBucket extends Construct {
       versioned: true,
     });
 
-    cdk.Tags.of(this.bucket).add('Name', 'KeycloakCertificates');
+    cdk.Tags.of(this.bucket).add('keycloak:name', 'KeycloakCertificates');
 
     NagSuppressions.addResourceSuppressions(this.bucket, [
       {
