@@ -1,3 +1,4 @@
+import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import type * as s3 from 'aws-cdk-lib/aws-s3';
@@ -66,6 +67,8 @@ export class KeycloakNlb extends Construct {
     this.listener.addTargets('KeycloakTarget', {
       healthCheck: {
         enabled: true,
+        healthyThresholdCount: 3,
+        interval: cdk.Duration.seconds(10),
         path: '/health/ready',
         port: '9000',
         protocol: elbv2.Protocol.HTTPS,

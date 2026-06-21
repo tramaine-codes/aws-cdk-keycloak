@@ -50,7 +50,7 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
         },
         "DesiredCount": 1,
         "EnableECSManagedTags": false,
-        "HealthCheckGracePeriodSeconds": 180,
+        "HealthCheckGracePeriodSeconds": 600,
         "LaunchType": "FARGATE",
         "LoadBalancers": [
           {
@@ -344,9 +344,11 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
     "KeycloakKeycloakNlbListenerKeycloakTargetGroup17D85338": {
       "Properties": {
         "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 10,
         "HealthCheckPath": "/health/ready",
         "HealthCheckPort": "9000",
         "HealthCheckProtocol": "HTTPS",
+        "HealthyThresholdCount": 3,
         "Port": 8443,
         "Protocol": "TCP",
         "TargetType": "ip",

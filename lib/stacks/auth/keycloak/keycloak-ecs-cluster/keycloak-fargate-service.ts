@@ -52,7 +52,7 @@ export class KeycloakFargateService extends Construct {
       circuitBreaker: { rollback: true },
       cluster,
       desiredCount: 1,
-      healthCheckGracePeriod: cdk.Duration.minutes(3),
+      healthCheckGracePeriod: cdk.Duration.minutes(10),
       minHealthyPercent: 0,
       securityGroups: [this.serviceSecurityGroup],
       taskDefinition,
