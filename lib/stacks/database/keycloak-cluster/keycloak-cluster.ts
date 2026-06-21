@@ -35,7 +35,10 @@ export class KeycloakCluster extends Construct {
     this.clusterSecurityGroup = new ec2.SecurityGroup(
       this,
       'KeycloakClusterSecurityGroup',
-      { vpc }
+      {
+        allowAllOutbound: false,
+        vpc,
+      }
     );
 
     this.cluster = new rds.DatabaseCluster(this, 'KeycloakCluster', {
