@@ -121,3 +121,33 @@ strategy — e.g. a count sized to (manifests-per-version x versions-to-keep), o
 tag-based rules that key off the tagged index rather than the untagged
 sub-manifests. Acceptable as-is for a pin-the-current-digest workflow, but
 revisit before keeping multiple versions in a repo.
+
+---
+
+## 6. CMK-encrypt the Secrets Manager secrets (via a `SecureSecret` construct)
+
+**Context.** The Keycloak `AdminSecret` (`keycloak-task-definition.ts`) and the
+Aurora database secret (`keycloak-cluster.ts`) are encrypted with the default
+`aws/secretsmanager` AWS-managed key, not customer-managed CMKs. For the ADC
+posture we want customer-controlled, revocable, auditable key material.
+
+**Why it isn't a drop-in.** Passing a `SecureKey` as the secret's
+`encryptionKey` triggers a cross-stack dependency cycle. The database secret's
+CMK lives in `DatabaseStack`, but its consumer — the ECS execution role — lives
+in `AuthenticationStack`, which already depends on `DatabaseStack`. Because
+`SecureKey`'s policy does not trust account IAM identities, CDK writes the
+consumer's decrypt grant into the key's resource policy, so `DatabaseStack` then
+references the auth role and the two stacks form a cycle.
+
+**Do.** Build a `SecureSecret` construct that owns the key wiring:
+
+- Create a `SecureKey` internally with an `AccountSecretsManagerAccess`
+  statement (account-root data-plane scoped via
+  `kms:ViaService: secretsmanager.<region>.amazonaws.com`), so any account
+  principal may decrypt through Secrets Manager.
+- Override `grantRead` to grant the consumer `secretsmanager:GetSecretValue` and
+  `kms:Decrypt` on the consumer's IAM policy only (`iam.Grant.addToPrincipal`),
+  and NOT call `key.grantDecrypt` — that auto-grant is what mutates the key
+  resource policy cross-stack and creates the cycle.
+- Apply to the `AdminSecret` and the database secret (`rds.DatabaseSecret`
+  accepts an `encryptionKey`).
