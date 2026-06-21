@@ -139,7 +139,7 @@ npx cdk bootstrap
 **3. Deploy the prerequisites**
 
 ```bash
-npx cdk deploy Keycloak-NetworkStack Keycloak-DatabaseStack Keycloak-ArtifactsStack
+npx cdk deploy Keycloak-NetworkStack Keycloak-DatabaseStack Keycloak-ArtifactsStack --require-approval never
 ```
 
 **4. Upload TLS certificates to S3**
@@ -176,7 +176,7 @@ npx tsx scripts/upload-images.ts
 **6. Deploy the authentication stack**
 
 ```bash
-npx cdk deploy Keycloak-AuthenticationStack
+npx cdk deploy Keycloak-AuthenticationStack --require-approval never
 ```
 
 ## Development
