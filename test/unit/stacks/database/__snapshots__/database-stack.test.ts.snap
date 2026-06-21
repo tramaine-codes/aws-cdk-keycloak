@@ -40,6 +40,12 @@ exports[`DatabaseStack > composition matches snapshot 1`] = `
         "EnableHttpEndpoint": true,
         "Engine": "aurora-postgresql",
         "EngineVersion": "17.9",
+        "KmsKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakDatabaseClusterStorageEncryptionKeyDC09CAF9",
+            "Arn",
+          ],
+        },
         "MasterUserPassword": {
           "Fn::Join": [
             "",
@@ -172,6 +178,66 @@ exports[`DatabaseStack > composition matches snapshot 1`] = `
         "PubliclyAccessible": false,
       },
       "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakDatabaseClusterStorageEncryptionKeyAliasD1DCE007": {
+      "Properties": {
+        "AliasName": "alias/keycloak/rds/keycloak-cluster",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakDatabaseClusterStorageEncryptionKeyDC09CAF9",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "KeycloakDatabaseClusterStorageEncryptionKeyDC09CAF9": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:Create*",
+                "kms:Describe*",
+                "kms:Enable*",
+                "kms:Disable*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Update*",
+                "kms:Revoke*",
+                "kms:Tag*",
+                "kms:Untag*",
+                "kms:ScheduleKeyDeletion",
+                "kms:CancelKeyDeletion",
+                "kms:RotateKeyOnDemand",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "KeyManagement",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Delete",
     },
   },

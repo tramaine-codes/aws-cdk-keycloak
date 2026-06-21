@@ -5,6 +5,7 @@ import type * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import type { KeycloakFargateService } from '../../auth/keycloak/keycloak-ecs-cluster/keycloak-fargate-service.js';
+import { SecureKey } from '../../../constructs/kms/secure-key.js';
 import type { KeycloakVpc } from '../../network/keycloak-vpc/keycloak-vpc.js';
 
 interface KeycloakClusterProps extends cdk.StackProps {
@@ -31,6 +32,10 @@ export class KeycloakCluster extends Construct {
       }
     );
 
+    const storageEncryptionKey = new SecureKey(this, 'StorageEncryptionKey', {
+      alias: 'alias/keycloak/rds/keycloak-cluster',
+    });
+
     const { databaseSubnets, vpc } = networkVpc;
 
     this.clusterSecurityGroup = new ec2.SecurityGroup(
@@ -53,7 +58,7 @@ export class KeycloakCluster extends Construct {
       securityGroups: [this.clusterSecurityGroup],
       serverlessV2MaxCapacity: 1.0,
       serverlessV2MinCapacity: 0.5,
-      storageEncrypted: true,
+      storageEncryptionKey,
       vpc,
       vpcSubnets: { subnets: [...databaseSubnets] },
       writer: rds.ClusterInstance.serverlessV2('writer'),
