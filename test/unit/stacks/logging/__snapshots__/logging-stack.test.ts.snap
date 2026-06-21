@@ -404,7 +404,7 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
     },
     "AuditTrailKeyAliasD4F9B94C": {
       "Properties": {
-        "AliasName": "alias/keycloak/audit-trail",
+        "AliasName": "alias/keycloak/cloud-trail/audit-trail",
         "TargetKeyId": {
           "Fn::GetAtt": [
             "AuditTrailKeyA4D56A7A",

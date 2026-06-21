@@ -158,7 +158,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
     },
     "CertificatesBucketKeyAlias9D798D3B": {
       "Properties": {
-        "AliasName": "alias/keycloak/certificates-bucket",
+        "AliasName": "alias/keycloak/s3/certificates-bucket",
         "TargetKeyId": {
           "Fn::GetAtt": [
             "CertificatesBucketKey349C7E09",
@@ -453,7 +453,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
     },
     "KeycloakEcrRepositoriesAwsCliKeyAliasA237B6D5": {
       "Properties": {
-        "AliasName": "alias/keycloak/aws-cli",
+        "AliasName": "alias/keycloak/ecr/aws-cli",
         "TargetKeyId": {
           "Fn::GetAtt": [
             "KeycloakEcrRepositoriesAwsCliKey98024967",
@@ -495,7 +495,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
     },
     "KeycloakEcrRepositoriesKeycloakKeyAlias7199539C": {
       "Properties": {
-        "AliasName": "alias/keycloak/keycloak",
+        "AliasName": "alias/keycloak/ecr/keycloak",
         "TargetKeyId": {
           "Fn::GetAtt": [
             "KeycloakEcrRepositoriesKeycloakKeyFBB4C8D3",

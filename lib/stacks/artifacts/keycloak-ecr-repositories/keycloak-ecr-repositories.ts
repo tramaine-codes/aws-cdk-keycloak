@@ -11,12 +11,12 @@ export class KeycloakEcrRepositories extends Construct {
     super(scope, id);
 
     this.awsCliEcrRepository = new SecureEcrRepository(this, 'AwsCli', {
-      alias: 'alias/keycloak/aws-cli',
+      alias: 'alias/keycloak/ecr/aws-cli',
     });
     cdk.Tags.of(this.awsCliEcrRepository).add('keycloak:name', 'AwsCli');
 
     this.keycloakEcrRepository = new SecureEcrRepository(this, 'Keycloak', {
-      alias: 'alias/keycloak/keycloak',
+      alias: 'alias/keycloak/ecr/keycloak',
     });
     cdk.Tags.of(this.keycloakEcrRepository).add('keycloak:name', 'Keycloak');
   }

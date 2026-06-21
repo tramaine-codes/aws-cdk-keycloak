@@ -16,7 +16,7 @@ export class AuditTrail extends Construct {
     const stack = cdk.Stack.of(this);
 
     const encryptionKey = new SecureKey(this, 'Key', {
-      alias: 'alias/keycloak/audit-trail',
+      alias: 'alias/keycloak/cloud-trail/audit-trail',
     });
     cdk.Tags.of(encryptionKey).add('keycloak:name', 'AuditTrailKey');
 

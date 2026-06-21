@@ -19,7 +19,7 @@ export class ArtifactsStack extends cdk.Stack {
       this,
       'CertificatesBucket',
       {
-        alias: 'alias/keycloak/certificates-bucket',
+        alias: 'alias/keycloak/s3/certificates-bucket',
         serverAccessLogsBucket: props.serverAccessLogsBucket,
         serverAccessLogsPrefix: 'keycloak-certificates-bucket',
       }
