@@ -16,7 +16,10 @@ self-signed certificates, which mirrors the AWS topology.
 - [Node.js](https://nodejs.org/) v24 — version pinned in `.node-version` (Volta)
   and `.nvmrc` (NVM)
 - [Docker](https://docs.docker.com/get-docker/) — for local development
-- [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html):
+- [skopeo](https://github.com/containers/skopeo/blob/main/install.md) — used by
+  `scripts/upload-images.ts` to mirror images into ECR (or set
+  `IMAGE_COPY_TOOL=docker` to use Docker instead)
+- [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html):
   `npm install -g aws-cdk`
 - AWS credentials configured (via `~/.aws/credentials`, environment variables,
   or IAM role)
