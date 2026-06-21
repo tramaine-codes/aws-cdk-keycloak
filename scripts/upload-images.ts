@@ -136,9 +136,17 @@ const copyImageWithDocker = (
         '--password',
         credentials.password,
       ]),
-      run('docker', ['pull', source]),
-      run('docker', ['tag', source, destination]),
-      run('docker', ['push', destination]),
+      // Copy the manifest list as-is, preserving multi-arch and the source
+      // digest. A plain pull/tag/push would flatten it to a single architecture
+      // and land it under a different digest than the task definition pins.
+      run('docker', [
+        'buildx',
+        'imagetools',
+        'create',
+        '--tag',
+        destination,
+        source,
+      ]),
     ],
     { concurrency: 1 }
   ).pipe(Effect.asVoid);
@@ -150,10 +158,14 @@ const copyImageWithSkopeo = (
 ) =>
   run('skopeo', [
     'copy',
-    `docker://${source}`,
-    `docker://${destination}`,
+    // Copy the whole multi-arch index as-is: avoids host-platform matching
+    // (the source is linux-only, the host may be darwin) and preserves the
+    // index digest so it matches the digest the task definition pins.
+    '--all',
     '--dest-creds',
     credentials.creds,
+    `docker://${source}`,
+    `docker://${destination}`,
   ]).pipe(Effect.asVoid);
 
 const copyImage = (
