@@ -39,10 +39,11 @@ TypeScript via `tsx` (no compile step needed at runtime).
   - **`scripts/upload-images.ts`** — Mirrors the pinned Keycloak and aws-cli
     container images (by digest) into the ECR repositories it discovers by
     `keycloak:name` tag. Requires AWS credentials (as above) and a registry copy
-    tool — `skopeo` (default) or `docker` (set `IMAGE_COPY_TOOL=docker`). Must
-    run after `Keycloak-ArtifactsStack` (which creates the repositories) and
-    before `Keycloak-AuthenticationStack` (whose task definition pulls the
-    images by digest). Run with `npx tsx scripts/upload-images.ts`.
+    tool — `skopeo` (default) or Docker Buildx (`docker buildx`, set
+    `IMAGE_COPY_TOOL=docker`). Must run after `Keycloak-ArtifactsStack` (which
+    creates the repositories) and before `Keycloak-AuthenticationStack` (whose
+    task definition pulls the images by digest). Run with
+    `npx tsx scripts/upload-images.ts`.
 - **`test/unit/`** — Vitest unit tests. CDK stack assertions use
   `aws-cdk-lib/assertions` (`Template.fromStack`).
 
