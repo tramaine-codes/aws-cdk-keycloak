@@ -13,8 +13,8 @@ export class KeycloakEcsCluster extends Construct {
     super(scope, id);
 
     this.cluster = new ecs.Cluster(this, 'Cluster', {
-      vpc,
       containerInsightsV2: ecs.ContainerInsights.ENABLED,
+      vpc,
     });
   }
 }
