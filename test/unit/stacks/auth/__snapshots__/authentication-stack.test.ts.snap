@@ -157,6 +157,24 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
+    "KeycloakKeycloakFargateServiceSecurityGrouptoKeycloakDatabaseStackKeycloakDatabaseClusterKeycloakClusterSecurityGroup3D74BEEA5432E64B0F29": {
+      "Properties": {
+        "Description": "to KeycloakDatabaseStackKeycloakDatabaseClusterKeycloakClusterSecurityGroup3D74BEEA:5432",
+        "DestinationSecurityGroupId": {
+          "Fn::ImportValue": "Keycloak-DatabaseStack:ExportsOutputFnGetAttKeycloakDatabaseClusterKeycloakClusterSecurityGroupD49D0080GroupId5FB0B507",
+        },
+        "FromPort": 5432,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
     "KeycloakKeycloakFargateServiceSecurityGrouptoKeycloakNetworkStackKeycloakVpcEndpointEndpointSecurityGroup48F1F2644435ADD3D89": {
       "Properties": {
         "Description": "to KeycloakNetworkStackKeycloakVpcEndpointEndpointSecurityGroup48F1F264:443",

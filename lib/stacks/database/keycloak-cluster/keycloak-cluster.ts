@@ -4,6 +4,7 @@ import * as rds from 'aws-cdk-lib/aws-rds';
 import type * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
+import type { KeycloakFargateService } from '../../auth/keycloak/keycloak-ecs-cluster/keycloak-fargate-service.js';
 import type { KeycloakVpc } from '../../network/keycloak-vpc/keycloak-vpc.js';
 
 interface KeycloakClusterProps extends cdk.StackProps {
@@ -85,12 +86,19 @@ export class KeycloakCluster extends Construct {
     ]);
   }
 
-  allowIngressFrom = (peer: ec2.ISecurityGroup) => {
+  allowIngressFromKeycloak = ({
+    serviceSecurityGroup,
+  }: KeycloakFargateService) => {
     this.clusterSecurityGroup.addIngressRule(
-      peer,
+      serviceSecurityGroup,
       ec2.Port.tcp(5432),
       undefined,
       true
+    );
+
+    serviceSecurityGroup.addEgressRule(
+      this.clusterSecurityGroup,
+      ec2.Port.tcp(5432)
     );
   };
 

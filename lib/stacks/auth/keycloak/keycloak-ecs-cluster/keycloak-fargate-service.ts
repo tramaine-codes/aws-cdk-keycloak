@@ -64,6 +64,6 @@ export class KeycloakFargateService extends Construct {
       containerPort: 8443,
     });
 
-    databaseCluster.allowIngressFrom(this.serviceSecurityGroup);
+    databaseCluster.allowIngressFromKeycloak(this);
   }
 }
