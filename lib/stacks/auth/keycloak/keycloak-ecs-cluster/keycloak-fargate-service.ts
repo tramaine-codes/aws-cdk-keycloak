@@ -14,7 +14,7 @@ interface KeycloakFargateServiceProps {
 
 export class KeycloakFargateService extends Construct {
   readonly loadBalancerTarget: ecs.IEcsLoadBalancerTarget;
-  readonly serviceSecurityGroup: ec2.ISecurityGroup;
+  readonly serviceSecurityGroup: ec2.SecurityGroup;
 
   constructor(
     scope: Construct,

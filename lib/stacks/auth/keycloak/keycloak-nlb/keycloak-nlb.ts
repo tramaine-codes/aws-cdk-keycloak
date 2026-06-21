@@ -35,28 +35,24 @@ export class KeycloakNlb extends Construct {
     this.nlb = new elbv2.NetworkLoadBalancer(this, 'Nlb', {
       internetFacing: true,
       loadBalancerName: 'keycloak-nlb',
+      securityGroups: [this.securityGroup],
       vpc,
       vpcSubnets: { subnets: [...publicSubnets] },
     });
 
     this.nlb.logAccessLogs(serverAccessLogsBucket, 'keycloak-nlb');
-    // this.nlb.connections.allowFromAnyIpv4(ec2.Port.tcp(443));
 
     this.listener = this.nlb.addListener('Listener', {
       port: 443,
     });
 
-    NagSuppressions.addResourceSuppressions(
-      // this.nlb.connections.securityGroups[0],
-      this.securityGroup,
-      [
-        {
-          id: 'AwsSolutions-EC23',
-          reason:
-            'The NLB is internet-facing and must accept inbound HTTPS traffic on port 443 from any IP.',
-        },
-      ]
-    );
+    NagSuppressions.addResourceSuppressions(this.securityGroup, [
+      {
+        id: 'AwsSolutions-EC23',
+        reason:
+          'The NLB is internet-facing and must accept inbound HTTPS traffic on port 443 from any IP.',
+      },
+    ]);
   }
 
   get loadBalancerDnsName() {
@@ -79,9 +75,10 @@ export class KeycloakNlb extends Construct {
       targets: [loadBalancerTarget],
     });
 
-    // this.nlb.connections.allowTo(serviceSecurityGroup, ec2.Port.tcp(8443));
-    // this.nlb.connections.allowTo(serviceSecurityGroup, ec2.Port.tcp(9000));
     this.securityGroup.addEgressRule(serviceSecurityGroup, ec2.Port.tcp(8443));
     this.securityGroup.addEgressRule(serviceSecurityGroup, ec2.Port.tcp(9000));
+
+    serviceSecurityGroup.addIngressRule(this.securityGroup, ec2.Port.tcp(8443));
+    serviceSecurityGroup.addIngressRule(this.securityGroup, ec2.Port.tcp(9000));
   };
 }

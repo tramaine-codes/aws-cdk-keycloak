@@ -115,6 +115,48 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
+    "KeycloakKeycloakFargateServiceSecurityGroupfromKeycloakAuthenticationStackKeycloakKeycloakNlbEndpointSecurityGroupAEB4F01B8443356C3A9E": {
+      "Properties": {
+        "Description": "from KeycloakAuthenticationStackKeycloakKeycloakNlbEndpointSecurityGroupAEB4F01B:8443",
+        "FromPort": 8443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakNlbEndpointSecurityGroupE478528C",
+            "GroupId",
+          ],
+        },
+        "ToPort": 8443,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "KeycloakKeycloakFargateServiceSecurityGroupfromKeycloakAuthenticationStackKeycloakKeycloakNlbEndpointSecurityGroupAEB4F01B90005D6C9719": {
+      "Properties": {
+        "Description": "from KeycloakAuthenticationStackKeycloakKeycloakNlbEndpointSecurityGroupAEB4F01B:9000",
+        "FromPort": 9000,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakNlbEndpointSecurityGroupE478528C",
+            "GroupId",
+          ],
+        },
+        "ToPort": 9000,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
     "KeycloakKeycloakFargateServiceSecurityGrouptoKeycloakNetworkStackKeycloakVpcEndpointEndpointSecurityGroup48F1F2644435ADD3D89": {
       "Properties": {
         "Description": "to KeycloakNetworkStackKeycloakVpcEndpointEndpointSecurityGroup48F1F264:443",
@@ -173,6 +215,14 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
         ],
         "Name": "keycloak-nlb",
         "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "KeycloakKeycloakNlbEndpointSecurityGroupE478528C",
+              "GroupId",
+            ],
+          },
+        ],
         "Subnets": [
           {
             "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpcPublicSubnet1SubnetEE37F855B9947658",

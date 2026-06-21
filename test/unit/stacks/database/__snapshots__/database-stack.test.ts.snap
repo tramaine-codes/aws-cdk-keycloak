@@ -133,9 +133,11 @@ exports[`DatabaseStack > composition matches snapshot 1`] = `
         "GroupDescription": "Keycloak-DatabaseStack/KeycloakDatabaseCluster/KeycloakClusterSecurityGroup",
         "SecurityGroupEgress": [
           {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
+            "CidrIp": "255.255.255.255/32",
+            "Description": "Disallow all traffic",
+            "FromPort": 252,
+            "IpProtocol": "icmp",
+            "ToPort": 86,
           },
         ],
         "VpcId": {
