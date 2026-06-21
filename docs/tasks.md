@@ -102,3 +102,22 @@ is no session/state replication or HA.
 **Decisions to make.** Cache stack (default JDBC_PING vs. DNS_PING via Cloud Map
 / ECS Service Connect), target replica count, and whether the NLB needs any
 stickiness (with a distributed cache it generally does not).
+
+---
+
+## 5. Make the ECR lifecycle policy multi-arch-aware
+
+**Context.** `SecureEcrRepository` sets
+`lifecycleRules: [{ maxImageCount: 10 }]`. A multi-arch image is not one
+manifest but an index plus one manifest per platform (plus build attestations):
+`keycloak:26.6.1` is **7** ECR images (the index, three platform images for
+amd64/arm64/ppc64le, and three attestation manifests); `aws-cli` is 3.
+`maxImageCount` counts every manifest, so 10 holds only ~1 keycloak version — a
+second version push starts expiring the oldest images and can leave a prior
+version's index partially pruned (a broken, unpullable index).
+
+**Do.** Replace the blunt `maxImageCount` with a multi-arch-safe retention
+strategy — e.g. a count sized to (manifests-per-version x versions-to-keep), or
+tag-based rules that key off the tagged index rather than the untagged
+sub-manifests. Acceptable as-is for a pin-the-current-digest workflow, but
+revisit before keeping multiple versions in a repo.
