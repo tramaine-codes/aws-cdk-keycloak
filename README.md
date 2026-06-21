@@ -1,4 +1,4 @@
-# aws-cdk-keycloak
+# AWS CDK Keycloak
 
 [![GitHub](https://img.shields.io/badge/GitHub-tramaine--codes%2Faws--cdk--keycloak-blue?logo=github)](https://github.com/tramaine-codes/aws-cdk-keycloak)
 
