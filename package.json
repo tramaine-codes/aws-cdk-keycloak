@@ -1,11 +1,18 @@
 {
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "effect@4.0.0-beta.84": true,
+    "msgpackr-extract@3.0.4": true
+  },
   "bin": {
     "aws-cdk-keycloak": "bin/aws-cdk-keycloak.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1072.0",
-    "@aws-sdk/credential-providers": "3.1072.0",
-    "@aws-sdk/lib-storage": "3.1072.0",
+    "@aws-sdk/client-ecr": "3.1073.0",
+    "@aws-sdk/client-s3": "3.1073.0",
+    "@aws-sdk/credential-providers": "3.1073.0",
+    "@aws-sdk/lib-storage": "3.1073.0",
     "aws-cdk-lib": "2.260.0",
     "constructs": "10.6.0",
     "effect": "4.0.0-beta.84",
@@ -13,6 +20,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.0",
+    "@changesets/cli": "2.31.0",
     "@commitlint/cli": "21.0.2",
     "@commitlint/config-conventional": "21.0.2",
     "@types/node": "24.13.2",
@@ -21,14 +29,14 @@
     "cdk-nag": "2.38.2",
     "del-cli": "7.0.0",
     "husky": "9.1.7",
-    "lint-staged": "17.0.7",
+    "lint-staged": "17.0.8",
     "prettier": "3.8.4",
     "tsx": "4.22.4",
     "typescript": "6.0.3",
     "vitest": "4.1.9"
   },
   "engines": {
-    "node": "24.16.0",
+    "node": "24.17.0",
     "npm": "11.17.0"
   },
   "homepage": "https://github.com/tramaine-codes/aws-cdk-keycloak",
@@ -41,8 +49,13 @@
     "build": "tsc",
     "build:ci": "npm run clean && npm test && tsc",
     "cdk": "cdk",
+    "changeset": "changeset",
+    "changeset:tag": "changeset tag",
+    "changeset:version": "changeset version",
     "clean": "del-cli coverage",
-    "format": "biome format --fix --no-errors-on-unmatched .",
+    "format": "biome format --fix --no-errors-on-unmatched . && prettier --write \"**/*.md\"",
+    "format:md": "prettier --write \"**/*.md\"",
+    "format:md:check": "prettier --check \"**/*.md\"",
     "lint": "biome lint --no-errors-on-unmatched .",
     "lint:fix": "biome lint --fix --no-errors-on-unmatched .",
     "prepare": "husky",
@@ -54,13 +67,7 @@
   "type": "module",
   "version": "0.1.0",
   "volta": {
-    "node": "24.16.0",
+    "node": "24.17.0",
     "npm": "11.17.0"
-  },
-  "allowScripts": {
-    "esbuild@0.28.1": true,
-    "fsevents@2.3.3": true,
-    "effect@4.0.0-beta.84": true,
-    "msgpackr-extract@3.0.4": true
   }
 }

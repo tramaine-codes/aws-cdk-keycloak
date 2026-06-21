@@ -1,0 +1,856 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AuthenticationStack > composition matches snapshot 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "KeycloakKeycloakEcsCluster8BC4A434": {
+      "Properties": {
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "enabled",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::Cluster",
+    },
+    "KeycloakKeycloakFargateService3AF17172": {
+      "DependsOn": [
+        "KeycloakKeycloakNlbListenerKeycloakTargetGroup17D85338",
+        "KeycloakKeycloakNlbListenerE2362EF4",
+        "KeycloakKeycloakTaskDefinitionTaskRoleDefaultPolicy4CF1E2AD",
+        "KeycloakKeycloakTaskDefinitionTaskRole743056A1",
+      ],
+      "Properties": {
+        "Cluster": {
+          "Ref": "KeycloakKeycloakEcsCluster8BC4A434",
+        },
+        "DeploymentConfiguration": {
+          "Alarms": {
+            "AlarmNames": [],
+            "Enable": false,
+            "Rollback": false,
+          },
+          "DeploymentCircuitBreaker": {
+            "Enable": true,
+            "Rollback": true,
+          },
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 0,
+        },
+        "DeploymentController": {
+          "Type": "ECS",
+        },
+        "DesiredCount": 1,
+        "EnableECSManagedTags": false,
+        "HealthCheckGracePeriodSeconds": 180,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "keycloak",
+            "ContainerPort": 8443,
+            "TargetGroupArn": {
+              "Ref": "KeycloakKeycloakNlbListenerKeycloakTargetGroup17D85338",
+            },
+          },
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [
+              {
+                "Fn::GetAtt": [
+                  "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+                  "GroupId",
+                ],
+              },
+            ],
+            "Subnets": [
+              {
+                "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpcApplicationSubnet1Subnet2158031C307A1304",
+              },
+              {
+                "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpcApplicationSubnet2Subnet76A4B8F3BD2F4F1D",
+              },
+            ],
+          },
+        },
+        "TaskDefinition": {
+          "Ref": "KeycloakKeycloakTaskDefinition55C2A524",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "KeycloakKeycloakFargateServiceSecurityGroup7151DC10": {
+      "Properties": {
+        "GroupDescription": "Keycloak-AuthenticationStack/Keycloak/KeycloakFargateService/SecurityGroup",
+        "VpcId": {
+          "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpc3B97A761C49F1BD8",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "KeycloakKeycloakFargateServiceSecurityGroupKeycloakDatabaseStackKeycloakDatabaseClusterKeycloakClusterSecurityGroup3D74BEEA5432to864C7B89": {
+      "Properties": {
+        "Description": "from KeycloakAuthenticationStackKeycloakKeycloakFargateServiceSecurityGroup7874E613:5432",
+        "FromPort": 5432,
+        "GroupId": {
+          "Fn::ImportValue": "Keycloak-DatabaseStack:ExportsOutputFnGetAttKeycloakDatabaseClusterKeycloakClusterSecurityGroupD49D0080GroupId5FB0B507",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "KeycloakKeycloakFargateServiceSecurityGrouptoKeycloakNetworkStackKeycloakVpcEndpointEndpointSecurityGroup48F1F2644435ADD3D89": {
+      "Properties": {
+        "Description": "to KeycloakNetworkStackKeycloakVpcEndpointEndpointSecurityGroup48F1F264:443",
+        "DestinationSecurityGroupId": {
+          "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputFnGetAttKeycloakVpcEndpointEndpointSecurityGroup3D5A4B03GroupId89FFE20B",
+        },
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 443,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "KeycloakKeycloakFargateServiceSecurityGrouptoplxxxxxxxx44341A1074B": {
+      "Properties": {
+        "Description": "to pl-xxxxxxxx:443",
+        "DestinationPrefixListId": "pl-xxxxxxxx",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 443,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "KeycloakKeycloakNlbBD2CDD92": {
+      "Properties": {
+        "LoadBalancerAttributes": [
+          {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+          {
+            "Key": "access_logs.s3.enabled",
+            "Value": "true",
+          },
+          {
+            "Key": "access_logs.s3.bucket",
+            "Value": {
+              "Fn::ImportValue": "Keycloak-LoggingStack:ExportsOutputRefServerAccessLogsBucket5E4597E8F6E45B89",
+            },
+          },
+          {
+            "Key": "access_logs.s3.prefix",
+            "Value": "keycloak-nlb",
+          },
+        ],
+        "Name": "keycloak-nlb",
+        "Scheme": "internet-facing",
+        "Subnets": [
+          {
+            "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpcPublicSubnet1SubnetEE37F855B9947658",
+          },
+          {
+            "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpcPublicSubnet2Subnet9480479F98FE57BF",
+          },
+        ],
+        "Type": "network",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    },
+    "KeycloakKeycloakNlbEndpointSecurityGroupE478528C": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-EC23",
+              "reason": "The NLB is internet-facing and must accept inbound HTTPS traffic on port 443 from any IP.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "GroupDescription": "Allow HTTPS from within the VPC to interface endpoints",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "from 0.0.0.0/0:443",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443,
+          },
+        ],
+        "VpcId": {
+          "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpc3B97A761C49F1BD8",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "KeycloakKeycloakNlbEndpointSecurityGrouptoKeycloakAuthenticationStackKeycloakKeycloakFargateServiceSecurityGroup7874E61384436A1485A7": {
+      "Properties": {
+        "Description": "to KeycloakAuthenticationStackKeycloakKeycloakFargateServiceSecurityGroup7874E613:8443",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "FromPort": 8443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakNlbEndpointSecurityGroupE478528C",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 8443,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "KeycloakKeycloakNlbEndpointSecurityGrouptoKeycloakAuthenticationStackKeycloakKeycloakFargateServiceSecurityGroup7874E61390006E8B1102": {
+      "Properties": {
+        "Description": "to KeycloakAuthenticationStackKeycloakKeycloakFargateServiceSecurityGroup7874E613:9000",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakFargateServiceSecurityGroup7151DC10",
+            "GroupId",
+          ],
+        },
+        "FromPort": 9000,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakNlbEndpointSecurityGroupE478528C",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 9000,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "KeycloakKeycloakNlbListenerE2362EF4": {
+      "Properties": {
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "KeycloakKeycloakNlbListenerKeycloakTargetGroup17D85338",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "KeycloakKeycloakNlbBD2CDD92",
+        },
+        "Port": 443,
+        "Protocol": "TCP",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "KeycloakKeycloakNlbListenerKeycloakTargetGroup17D85338": {
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckPath": "/health/ready",
+        "HealthCheckPort": "9000",
+        "HealthCheckProtocol": "HTTPS",
+        "Port": 8443,
+        "Protocol": "TCP",
+        "TargetType": "ip",
+        "VpcId": {
+          "Fn::ImportValue": "Keycloak-NetworkStack:ExportsOutputRefKeycloakVpc3B97A761C49F1BD8",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "KeycloakKeycloakTaskDefinition55C2A524": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-ECS2",
+              "reason": "Non-sensitive Keycloak configuration values (database URL, port, name, username, and TLS paths) are provided as plaintext environment variables. Sensitive values (passwords) are already managed via Secrets Manager.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Command": [
+              "s3",
+              "sync",
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    "s3://",
+                    {
+                      "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputRefCertificatesBucketE5F004DBD9EB91C4",
+                    },
+                  ],
+                ],
+              },
+              "/opt/keycloak/conf/certs",
+            ],
+            "Essential": false,
+            "Image": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Select": [
+                      4,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakEcrRepositoriesAwsCliBA060F4DArn506A4F73",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".dkr.ecr.",
+                  {
+                    "Fn::Select": [
+                      3,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakEcrRepositoriesAwsCliBA060F4DArn506A4F73",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/",
+                  {
+                    "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputRefKeycloakEcrRepositoriesAwsCliBA060F4D86657DB6",
+                  },
+                  "@sha256:HASH",
+                ],
+              ],
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "KeycloakKeycloakTaskDefinitionLogGroup3A331D02",
+                },
+                "awslogs-region": "us-east-1",
+                "awslogs-stream-prefix": "init-certs",
+              },
+            },
+            "MountPoints": [
+              {
+                "ContainerPath": "/opt/keycloak/conf/certs",
+                "ReadOnly": false,
+                "SourceVolume": "certs",
+              },
+            ],
+            "Name": "init-certs",
+          },
+          {
+            "Command": [
+              "start",
+            ],
+            "DependsOn": [
+              {
+                "Condition": "SUCCESS",
+                "ContainerName": "init-certs",
+              },
+            ],
+            "Environment": [
+              {
+                "Name": "KC_BOOTSTRAP_ADMIN_USERNAME",
+                "Value": "admin",
+              },
+              {
+                "Name": "KC_CACHE",
+                "Value": "local",
+              },
+              {
+                "Name": "KC_DB",
+                "Value": "postgres",
+              },
+              {
+                "Name": "KC_DB_URL_DATABASE",
+                "Value": "keycloak",
+              },
+              {
+                "Name": "KC_DB_URL_HOST",
+                "Value": {
+                  "Fn::ImportValue": "Keycloak-DatabaseStack:ExportsOutputFnGetAttKeycloakDatabaseClusterKeycloakCluster922909FAEndpointAddressA07A9ABA",
+                },
+              },
+              {
+                "Name": "KC_DB_URL_PORT",
+                "Value": {
+                  "Fn::ImportValue": "Keycloak-DatabaseStack:ExportsOutputFnGetAttKeycloakDatabaseClusterKeycloakCluster922909FAEndpointPortD2023C04",
+                },
+              },
+              {
+                "Name": "KC_DB_USERNAME",
+                "Value": "keycloak",
+              },
+              {
+                "Name": "KC_HEALTH_ENABLED",
+                "Value": "true",
+              },
+              {
+                "Name": "KC_HOSTNAME",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "https://",
+                      {
+                        "Fn::GetAtt": [
+                          "KeycloakKeycloakNlbBD2CDD92",
+                          "DNSName",
+                        ],
+                      },
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "KC_HTTP_ENABLED",
+                "Value": "true",
+              },
+              {
+                "Name": "KC_HTTPS_CERTIFICATE_FILE",
+                "Value": "/opt/keycloak/conf/certs/upstream.cert.pem",
+              },
+              {
+                "Name": "KC_HTTPS_CERTIFICATE_KEY_FILE",
+                "Value": "/opt/keycloak/conf/certs/upstream.key.pem",
+              },
+            ],
+            "Essential": true,
+            "Image": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Select": [
+                      4,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakEcrRepositoriesKeycloak910C474CArnE528219F",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".dkr.ecr.",
+                  {
+                    "Fn::Select": [
+                      3,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakEcrRepositoriesKeycloak910C474CArnE528219F",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/",
+                  {
+                    "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputRefKeycloakEcrRepositoriesKeycloak910C474CD8591B0F",
+                  },
+                  "@sha256:HASH",
+                ],
+              ],
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "KeycloakKeycloakTaskDefinitionLogGroup3A331D02",
+                },
+                "awslogs-region": "us-east-1",
+                "awslogs-stream-prefix": "keycloak",
+              },
+            },
+            "MountPoints": [
+              {
+                "ContainerPath": "/opt/keycloak/conf/certs",
+                "ReadOnly": true,
+                "SourceVolume": "certs",
+              },
+            ],
+            "Name": "keycloak",
+            "PortMappings": [
+              {
+                "ContainerPort": 8443,
+                "Protocol": "tcp",
+              },
+              {
+                "ContainerPort": 9000,
+                "Protocol": "tcp",
+              },
+            ],
+            "Secrets": [
+              {
+                "Name": "KC_BOOTSTRAP_ADMIN_PASSWORD",
+                "ValueFrom": {
+                  "Ref": "KeycloakKeycloakTaskDefinitionAdminSecretCB8578F6",
+                },
+              },
+              {
+                "Name": "KC_DB_PASSWORD",
+                "ValueFrom": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::ImportValue": "Keycloak-DatabaseStack:ExportsOutputRefKeycloakDatabaseClusterKeycloakClusterSecret7BA40C9DD0378525",
+                      },
+                      ":password::",
+                    ],
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        "Cpu": "512",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakTaskDefinitionExecutionRole5FF44DEC",
+            "Arn",
+          ],
+        },
+        "Family": "KeycloakAuthenticationStackKeycloakKeycloakTaskDefinition97EDA144",
+        "Memory": "1024",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakTaskDefinitionTaskRole743056A1",
+            "Arn",
+          ],
+        },
+        "Volumes": [
+          {
+            "Name": "certs",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "KeycloakKeycloakTaskDefinitionAdminSecretCB8578F6": {
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-SMG4",
+              "reason": "Automatic secret rotation is disabled because this is not a production workload.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "GenerateSecretString": {
+          "ExcludePunctuation": true,
+          "PasswordLength": 32,
+        },
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakKeycloakTaskDefinitionExecutionRole5FF44DEC": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "applies_to": [
+                "Resource::*",
+              ],
+              "id": "AwsSolutions-IAM5",
+              "reason": "ecr:GetAuthorizationToken is account-scoped and cannot target a resource; it is required for the execution role to pull the Keycloak and aws-cli images from ECR.",
+            },
+            {
+              "id": "AwsSolutions-ECS2",
+              "reason": "Non-sensitive Keycloak configuration values (database URL, port, name, username, and TLS paths) are provided as plaintext environment variables. Sensitive values (passwords) are already managed via Secrets Manager.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "KeycloakKeycloakTaskDefinitionExecutionRoleDefaultPolicyAD5C5D2B": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "applies_to": [
+                "Resource::*",
+              ],
+              "id": "AwsSolutions-IAM5",
+              "reason": "ecr:GetAuthorizationToken is account-scoped and cannot target a resource; it is required for the execution role to pull the Keycloak and aws-cli images from ECR.",
+            },
+            {
+              "id": "AwsSolutions-ECS2",
+              "reason": "Non-sensitive Keycloak configuration values (database URL, port, name, username, and TLS paths) are provided as plaintext environment variables. Sensitive values (passwords) are already managed via Secrets Manager.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakEcrRepositoriesAwsCliBA060F4DArn506A4F73",
+              },
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "KeycloakKeycloakTaskDefinitionLogGroup3A331D02",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakEcrRepositoriesKeycloak910C474CArnE528219F",
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "KeycloakKeycloakTaskDefinitionAdminSecretCB8578F6",
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "Keycloak-DatabaseStack:ExportsOutputRefKeycloakDatabaseClusterKeycloakClusterSecret7BA40C9DD0378525",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "KeycloakKeycloakTaskDefinitionExecutionRoleDefaultPolicyAD5C5D2B",
+        "Roles": [
+          {
+            "Ref": "KeycloakKeycloakTaskDefinitionExecutionRole5FF44DEC",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "KeycloakKeycloakTaskDefinitionLogGroup3A331D02": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakKeycloakTaskDefinitionTaskRole743056A1": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-IAM5",
+              "reason": "The task role requires read access to all objects in the dedicated certificates bucket to retrieve TLS certificate files.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "KeycloakKeycloakTaskDefinitionTaskRoleDefaultPolicy4CF1E2AD": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-IAM5",
+              "reason": "The task role requires read access to all objects in the dedicated certificates bucket to retrieve TLS certificate files.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttCertificatesBucketE5F004DBArn598A74FC",
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttCertificatesBucketE5F004DBArn598A74FC",
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttCertificatesBucketKey349C7E09Arn9325F448",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "KeycloakKeycloakTaskDefinitionTaskRoleDefaultPolicy4CF1E2AD",
+        "Roles": [
+          {
+            "Ref": "KeycloakKeycloakTaskDefinitionTaskRole743056A1",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

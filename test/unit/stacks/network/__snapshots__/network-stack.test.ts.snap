@@ -1,0 +1,961 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NetworkStack > composition matches snapshot 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E": {
+      "DependsOn": [
+        "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": "cdk-hnb659fds-assets-000000000000-us-east-1",
+          "S3Key": "HASH.zip",
+        },
+        "Description": "Lambda function for removing all inbound/outbound rules from the VPC default security group",
+        "Handler": "__entrypoint__.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs24.x",
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          },
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:AuthorizeSecurityGroupIngress",
+                    "ec2:AuthorizeSecurityGroupEgress",
+                    "ec2:RevokeSecurityGroupIngress",
+                    "ec2:RevokeSecurityGroupEgress",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":ec2:us-east-1:000000000000:security-group/",
+                          {
+                            "Fn::GetAtt": [
+                              "KeycloakVpc3B97A761",
+                              "DefaultSecurityGroup",
+                            ],
+                          },
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "Inline",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "KeycloakVpc3B97A761": {
+      "Properties": {
+        "CidrBlock": "10.16.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "keycloak:name",
+            "Value": "NetworkVpc",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::VPC",
+    },
+    "KeycloakVpcApplicationSubnet1RouteTableAssociationDEF067FE": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcApplicationSubnet1RouteTableCCEE486E",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcApplicationSubnet1Subnet2158031C",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcApplicationSubnet1RouteTableCCEE486E": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/ApplicationSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcApplicationSubnet1Subnet2158031C": {
+      "Properties": {
+        "AvailabilityZone": "dummy1a",
+        "CidrBlock": "10.16.0.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Application",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/ApplicationSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcApplicationSubnet2RouteTable0AE76643": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/ApplicationSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcApplicationSubnet2RouteTableAssociationEE900125": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcApplicationSubnet2RouteTable0AE76643",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcApplicationSubnet2Subnet76A4B8F3",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcApplicationSubnet2Subnet76A4B8F3": {
+      "Properties": {
+        "AvailabilityZone": "dummy1b",
+        "CidrBlock": "10.16.1.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Application",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/ApplicationSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcCloudWatchFlowLogAB6ECFFB": {
+      "Properties": {
+        "DeliverLogsPermissionArn": {
+          "Fn::GetAtt": [
+            "KeycloakVpcCloudWatchFlowLogIAMRole11BB33FC",
+            "Arn",
+          ],
+        },
+        "LogDestinationType": "cloud-watch-logs",
+        "LogGroupName": {
+          "Ref": "KeycloakVpcCloudWatchFlowLogLogGroupB7050F50",
+        },
+        "ResourceId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+        "ResourceType": "VPC",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/CloudWatchFlowLog",
+          },
+        ],
+        "TrafficType": "ALL",
+      },
+      "Type": "AWS::EC2::FlowLog",
+    },
+    "KeycloakVpcCloudWatchFlowLogIAMRole11BB33FC": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "vpc-flow-logs.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/CloudWatchFlowLog",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "KeycloakVpcCloudWatchFlowLogIAMRoleDefaultPolicyE76A9F5E": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "KeycloakVpcCloudWatchFlowLogLogGroupB7050F50",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "KeycloakVpcCloudWatchFlowLogIAMRoleDefaultPolicyE76A9F5E",
+        "Roles": [
+          {
+            "Ref": "KeycloakVpcCloudWatchFlowLogIAMRole11BB33FC",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "KeycloakVpcCloudWatchFlowLogLogGroupB7050F50": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "RetentionInDays": 731,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/CloudWatchFlowLog",
+          },
+        ],
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "KeycloakVpcCloudWatchLogsEndpoint3256EE28": {
+      "Properties": {
+        "PrivateDnsEnabled": true,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "KeycloakVpcEndpointEndpointSecurityGroup3D5A4B03",
+              "GroupId",
+            ],
+          },
+        ],
+        "ServiceName": "com.amazonaws.us-east-1.logs",
+        "SubnetIds": [
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet1SubnetA8C2AA27",
+          },
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet2Subnet644DA949",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc",
+          },
+        ],
+        "VpcEndpointType": "Interface",
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::VPCEndpoint",
+    },
+    "KeycloakVpcDatabaseSubnet1RouteTable4F3EDB74": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/DatabaseSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcDatabaseSubnet1RouteTableAssociation70A1EEAA": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcDatabaseSubnet1RouteTable4F3EDB74",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcDatabaseSubnet1SubnetC33AB42B",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcDatabaseSubnet1SubnetC33AB42B": {
+      "Properties": {
+        "AvailabilityZone": "dummy1a",
+        "CidrBlock": "10.16.2.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Database",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/DatabaseSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcDatabaseSubnet2RouteTable8585B713": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/DatabaseSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcDatabaseSubnet2RouteTableAssociation9CE0CFCE": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcDatabaseSubnet2RouteTable8585B713",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcDatabaseSubnet2Subnet9C3602A0",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcDatabaseSubnet2Subnet9C3602A0": {
+      "Properties": {
+        "AvailabilityZone": "dummy1b",
+        "CidrBlock": "10.16.3.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Database",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/DatabaseSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcEcrDockerEndpointFD7FE073": {
+      "Properties": {
+        "PrivateDnsEnabled": true,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "KeycloakVpcEndpointEndpointSecurityGroup3D5A4B03",
+              "GroupId",
+            ],
+          },
+        ],
+        "ServiceName": "com.amazonaws.us-east-1.ecr.dkr",
+        "SubnetIds": [
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet1SubnetA8C2AA27",
+          },
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet2Subnet644DA949",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc",
+          },
+        ],
+        "VpcEndpointType": "Interface",
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::VPCEndpoint",
+    },
+    "KeycloakVpcEcrEndpoint75D26369": {
+      "Properties": {
+        "PrivateDnsEnabled": true,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "KeycloakVpcEndpointEndpointSecurityGroup3D5A4B03",
+              "GroupId",
+            ],
+          },
+        ],
+        "ServiceName": "com.amazonaws.us-east-1.ecr.api",
+        "SubnetIds": [
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet1SubnetA8C2AA27",
+          },
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet2Subnet644DA949",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc",
+          },
+        ],
+        "VpcEndpointType": "Interface",
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::VPCEndpoint",
+    },
+    "KeycloakVpcEndpointEndpointSecurityGroup3D5A4B03": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "CdkNagValidationFailure",
+              "reason": "AwsSolutions-EC23 cannot evaluate the ingress source because it is the VPC CIDR resolved as a CloudFormation token (Fn::GetAtt CidrBlock). Ingress is restricted to the VPC CIDR on HTTPS, not 0.0.0.0/0, so the rule is not actually violated.",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "GroupDescription": "Allow HTTPS from within the VPC to interface endpoints",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "255.255.255.255/32",
+            "Description": "Disallow all traffic",
+            "FromPort": 252,
+            "IpProtocol": "icmp",
+            "ToPort": 86,
+          },
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "KeycloakVpc3B97A761",
+                "CidrBlock",
+              ],
+            },
+            "Description": {
+              "Fn::Join": [
+                "",
+                [
+                  "from ",
+                  {
+                    "Fn::GetAtt": [
+                      "KeycloakVpc3B97A761",
+                      "CidrBlock",
+                    ],
+                  },
+                  ":443",
+                ],
+              ],
+            },
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443,
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "KeycloakVpcEndpointsSubnet1RouteTable629B48CE": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/EndpointsSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcEndpointsSubnet1RouteTableAssociationAFDF8CD4": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcEndpointsSubnet1RouteTable629B48CE",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcEndpointsSubnet1SubnetA8C2AA27",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcEndpointsSubnet1SubnetA8C2AA27": {
+      "Properties": {
+        "AvailabilityZone": "dummy1a",
+        "CidrBlock": "10.16.4.32/28",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Endpoints",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/EndpointsSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcEndpointsSubnet2RouteTableAssociationDC4FAEAE": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcEndpointsSubnet2RouteTableF90ED611",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcEndpointsSubnet2Subnet644DA949",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcEndpointsSubnet2RouteTableF90ED611": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/EndpointsSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcEndpointsSubnet2Subnet644DA949": {
+      "Properties": {
+        "AvailabilityZone": "dummy1b",
+        "CidrBlock": "10.16.4.48/28",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Endpoints",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/EndpointsSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcIGW8D57925B": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::InternetGateway",
+    },
+    "KeycloakVpcPublicSubnet1DefaultRoute2AABA39D": {
+      "DependsOn": [
+        "KeycloakVpcVPCGW6CE92B39",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "KeycloakVpcIGW8D57925B",
+        },
+        "RouteTableId": {
+          "Ref": "KeycloakVpcPublicSubnet1RouteTableED0B7862",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "KeycloakVpcPublicSubnet1RouteTableAssociationAAEEF841": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcPublicSubnet1RouteTableED0B7862",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcPublicSubnet1SubnetEE37F855",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcPublicSubnet1RouteTableED0B7862": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcPublicSubnet1SubnetEE37F855": {
+      "Properties": {
+        "AvailabilityZone": "dummy1a",
+        "CidrBlock": "10.16.4.0/28",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcPublicSubnet2DefaultRoute93003D84": {
+      "DependsOn": [
+        "KeycloakVpcVPCGW6CE92B39",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "KeycloakVpcIGW8D57925B",
+        },
+        "RouteTableId": {
+          "Ref": "KeycloakVpcPublicSubnet2RouteTableDF4D9299",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "KeycloakVpcPublicSubnet2RouteTableAssociation4EFCD9E3": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "KeycloakVpcPublicSubnet2RouteTableDF4D9299",
+        },
+        "SubnetId": {
+          "Ref": "KeycloakVpcPublicSubnet2Subnet9480479F",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "KeycloakVpcPublicSubnet2RouteTableDF4D9299": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "KeycloakVpcPublicSubnet2Subnet9480479F": {
+      "Properties": {
+        "AvailabilityZone": "dummy1b",
+        "CidrBlock": "10.16.4.16/28",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcRestrictDefaultSecurityGroupCustomResource35B8D8B6": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Account": "000000000000",
+        "DefaultSecurityGroupId": {
+          "Fn::GetAtt": [
+            "KeycloakVpc3B97A761",
+            "DefaultSecurityGroup",
+          ],
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::VpcRestrictDefaultSG",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakVpcS3Endpoint0AE29076": {
+      "Properties": {
+        "RouteTableIds": [
+          {
+            "Ref": "KeycloakVpcApplicationSubnet1RouteTableCCEE486E",
+          },
+          {
+            "Ref": "KeycloakVpcApplicationSubnet2RouteTable0AE76643",
+          },
+        ],
+        "ServiceName": {
+          "Fn::Join": [
+            "",
+            [
+              "com.amazonaws.",
+              {
+                "Ref": "AWS::Region",
+              },
+              ".s3",
+            ],
+          ],
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc",
+          },
+        ],
+        "VpcEndpointType": "Gateway",
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::VPCEndpoint",
+    },
+    "KeycloakVpcS3FlowLog75602645": {
+      "Properties": {
+        "LogDestination": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Fn::ImportValue": "Keycloak-LoggingStack:ExportsOutputFnGetAttFlowLogsBucket87F67F60ArnB009FA14",
+              },
+              "/keycloak-vpc-flow-logs",
+            ],
+          ],
+        },
+        "LogDestinationType": "s3",
+        "ResourceId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+        "ResourceType": "VPC",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/S3FlowLog",
+          },
+        ],
+        "TrafficType": "ALL",
+      },
+      "Type": "AWS::EC2::FlowLog",
+    },
+    "KeycloakVpcSecretsManagerEndpointFF8CA4DF": {
+      "Properties": {
+        "PrivateDnsEnabled": true,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "KeycloakVpcEndpointEndpointSecurityGroup3D5A4B03",
+              "GroupId",
+            ],
+          },
+        ],
+        "ServiceName": "com.amazonaws.us-east-1.secretsmanager",
+        "SubnetIds": [
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet1SubnetA8C2AA27",
+          },
+          {
+            "Ref": "KeycloakVpcEndpointsSubnet2Subnet644DA949",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc",
+          },
+        ],
+        "VpcEndpointType": "Interface",
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::VPCEndpoint",
+    },
+    "KeycloakVpcVPCGW6CE92B39": {
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "KeycloakVpcIGW8D57925B",
+        },
+        "VpcId": {
+          "Ref": "KeycloakVpc3B97A761",
+        },
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

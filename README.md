@@ -96,35 +96,28 @@ To resolve the service hostnames locally, add `upstream` and `downstream` to the
 ## Project Structure
 
 ```
-bin/
-  aws-cdk-keycloak.ts       # CDK app entry point
+bin/              # CDK app entry point (aws-cdk-keycloak.ts)
 lib/
-  artifacts/                # ArtifactsStack
-    keycloak-certificates-bucket/
-  auth/                     # AuthenticationStack
-    keycloak/               # Keycloak compose construct
-      keycloak-ecs-cluster/ # ECS cluster, task definition, Fargate service
-      keycloak-nlb/         # Network Load Balancer
-  database/                 # DatabaseStack
-    keycloak-cluster/       # Aurora PostgreSQL Serverless v2
-  network/                  # NetworkStack
-    keycloak-vpc/           # VPC, subnets
-scripts/
-  upload-certs.ts           # Upload certs/ to the Keycloak certificates bucket
+  constructs/     # Reusable Secure* constructs (ecr, kms, lambda, s3)
+  stacks/         # One directory per stack:
+    artifacts/    # ArtifactsStack — cert bucket and ECR repositories
+    auth/         # AuthenticationStack — Keycloak on ECS Fargate behind an NLB
+    database/     # DatabaseStack — Aurora PostgreSQL Serverless v2
+    logging/      # LoggingStack — audit trail, flow logs, security dashboard
+    network/      # NetworkStack — isolated VPC, subnets, endpoints
+scripts/          # Operational scripts (upload-certs, upload-images)
 test/
-  unit/                     # Vitest unit tests
-    network/
-      vpc/
+  unit/           # Vitest unit tests
 ```
 
 ## CDK Stacks
 
-| Stack                          | Description                             |
-| ------------------------------ | --------------------------------------- |
-| `Keycloak-NetworkStack`        | VPC and subnet infrastructure           |
-| `Keycloak-DatabaseStack`       | Aurora PostgreSQL Serverless v2 cluster |
-| `Keycloak-ArtifactsStack`      | S3 bucket for TLS certificates          |
-| `Keycloak-AuthenticationStack` | ECS Fargate service, NLB, ECS cluster   |
+| Stack                          | Description                                       |
+| ------------------------------ | ------------------------------------------------- |
+| `Keycloak-NetworkStack`        | VPC and subnet infrastructure                     |
+| `Keycloak-DatabaseStack`       | Aurora PostgreSQL Serverless v2 cluster           |
+| `Keycloak-ArtifactsStack`      | TLS certificate bucket and ECR image repositories |
+| `Keycloak-AuthenticationStack` | ECS Fargate service, NLB, ECS cluster             |
 
 ### Deployment
 
@@ -164,7 +157,20 @@ export AWS_SESSION_TOKEN=...   # if using temporary credentials
 npx tsx scripts/upload-certs.ts
 ```
 
-**5. Deploy the authentication stack**
+**5. Mirror the container images into ECR**
+
+The authentication task definition pulls the Keycloak and aws-cli images from
+private ECR repositories **by digest**, so the images must be mirrored into ECR
+before deploying `Keycloak-AuthenticationStack` — otherwise the Fargate task
+cannot pull them. The script discovers each repository by its `keycloak:name`
+tag and copies the pinned images using `skopeo` (default) or `docker`
+(`IMAGE_COPY_TOOL=docker`). Requires the same AWS credentials as above.
+
+```bash
+npx tsx scripts/upload-images.ts
+```
+
+**6. Deploy the authentication stack**
 
 ```bash
 npx cdk deploy Keycloak-AuthenticationStack
@@ -222,18 +228,18 @@ synthesis. Synthesis fails on any unaddressed violation.
 
 ### Suppressed findings
 
-| Finding              | Construct                    | Reason                                                                                                    |
-| -------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `AwsSolutions-VPC7`  | `KeycloakVpc`                | VPC flow logs disabled to reduce cost.                                                                    |
-| `AwsSolutions-ECS4`  | `KeycloakEcsCluster`         | CloudWatch Container Insights disabled to reduce cost.                                                    |
-| `AwsSolutions-IAM5`  | `KeycloakTaskDefinition`     | Task role needs read access to all objects in the certificates bucket.                                    |
-| `AwsSolutions-ECS2`  | `KeycloakTaskDefinition`     | Non-sensitive Keycloak config (DB URL, port, TLS paths) passed as plaintext. Secrets use Secrets Manager. |
-| `AwsSolutions-EC23`  | `KeycloakNlb`                | NLB is internet-facing and must accept inbound HTTPS traffic on port 443 from any IP.                     |
-| `AwsSolutions-ELB2`  | `KeycloakNlb`                | NLB access logs disabled to reduce cost.                                                                  |
-| `AwsSolutions-RDS6`  | `KeycloakCluster`            | IAM authentication disabled; Keycloak requires username/password.                                         |
-| `AwsSolutions-RDS10` | `KeycloakCluster`            | Deletion protection disabled for non-production workload.                                                 |
-| `AwsSolutions-SMG4`  | `KeycloakCluster`            | Automatic secret rotation disabled for non-production workload.                                           |
-| `AwsSolutions-S1`    | `KeycloakCertificatesBucket` | Server access logging disabled to reduce cost for a non-production workload.                              |
+| Finding                   | Construct                | Reason                                                                                                                   |
+| ------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `AwsSolutions-RDS6`       | `KeycloakCluster`        | IAM authentication disabled; Keycloak requires username/password.                                                        |
+| `AwsSolutions-RDS10`      | `KeycloakCluster`        | Deletion protection disabled for non-production workload.                                                                |
+| `AwsSolutions-SMG4`       | `KeycloakCluster`        | Automatic secret rotation disabled for non-production workload.                                                          |
+| `AwsSolutions-IAM5`       | `KeycloakTaskDefinition` | Task role needs read access to all objects in the certificates bucket.                                                   |
+| `AwsSolutions-IAM5`       | `KeycloakTaskDefinition` | Execution role: `ecr:GetAuthorizationToken` is account-scoped and required to pull images from ECR.                      |
+| `AwsSolutions-ECS2`       | `KeycloakTaskDefinition` | Non-sensitive Keycloak config (DB URL, port, TLS paths) passed as plaintext. Secrets use Secrets Manager.                |
+| `AwsSolutions-SMG4`       | `KeycloakTaskDefinition` | Admin bootstrap secret rotation disabled for non-production workload.                                                    |
+| `AwsSolutions-EC23`       | `KeycloakNlb`            | NLB is internet-facing and must accept inbound HTTPS traffic on port 443 from any IP.                                    |
+| `CdkNagValidationFailure` | `KeycloakVpcEndpoints`   | EC23 cannot evaluate the VPC-CIDR ingress (a CloudFormation token); access is restricted to the VPC CIDR, not 0.0.0.0/0. |
+| `AwsSolutions-S1`         | `SecureLogBucket`        | Log-destination bucket cannot send access logs to itself without a circular dependency.                                  |
 
 ## CI
 

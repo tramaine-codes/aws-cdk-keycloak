@@ -8,39 +8,41 @@ code in this repository.
 This is an AWS CDK TypeScript project. The CDK app is executed directly from
 TypeScript via `tsx` (no compile step needed at runtime).
 
-- **`bin/aws-cdk-delivery-patterns.ts`** — CDK app entry point; instantiates
-  stacks and passes them to `cdk.App`.
-- **`lib/`** — CDK constructs, organized by domain. Within each domain
-  directory, stacks and stages live at the top level; other constructs live in
-  named subdirectories that reflect their contents.
-  - **`lib/application/`** — `ApplicationStack` and `ApplicationStage`
-  - **`lib/directory/`** — `DirectoryStack` (AWS Managed Microsoft AD; writes
-    directory ID to SSM at `/delivery-patterns/directory-id`)
-    - **`lib/directory/microsoft-ad/`** — `MicrosoftAd` construct (KMS-encrypted
-      Secrets Manager admin password, `CfnMicrosoftAD` Standard edition, domain
-      `corp.awscdkdelivery.internal`)
-    - **`lib/directory/security-group/`** — `DirectorySecurityGroup` construct
-      (egress rules for all AD protocols)
-  - **`lib/logging/`** — `LoggingStack` (shared S3 server access logs bucket)
-  - **`lib/network/`** — `NetworkStack` (VPC, subnets, VPC endpoints); exposes
-    `vpc`, `isolatedSubnets`, and `privateSubnets` for consumption by
-    `DirectoryStack`
-    - **`lib/network/vpc/`** — `NetworkVpc` construct (VPC, subnets, DNS
-      settings)
-    - **`lib/network/vpc-endpoints/`** — `VpcEndpoints` construct (S3 gateway
-      endpoint; KMS, CloudWatch Logs, Secrets Manager, SSM, SSM Messages, and
-      EC2 Messages interface endpoints; endpoint security group)
-  - **`lib/pipeline/`** — `DeliveryPipelineStack` and `FoundationalStage`
-    - **`lib/pipeline/artifacts/`** — `ArtifactsBucket` construct (KMS key and
-      logging bucket managed internally)
-    - **`lib/pipeline/delivery-pipeline/`** — `DeliveryPipeline` construct
-  - **`lib/repository/`** — `RepositoryStack`
+- **`bin/aws-cdk-keycloak.ts`** — CDK app entry point; instantiates the five
+  stacks and wires their cross-stack dependencies.
+- **`lib/constructs/`** — Reusable, security-hardened constructs grouped by
+  service. Each `Secure*` construct extends its CDK L2 with the project's
+  baseline (KMS encryption, blocked public access, scan-on-push, and similar).
+  - **`lib/constructs/ecr/`** — `SecureEcrRepository`
+  - **`lib/constructs/kms/`** — `SecureKey`
+  - **`lib/constructs/lambda/`** — `SecureNodejsFunction`
+  - **`lib/constructs/s3/`** — `SecureBucket`, `SecureLogBucket`
+- **`lib/stacks/`** — CDK stacks, one directory per domain. The stack lives at
+  the top of each directory; its composing constructs live in named
+  subdirectories.
+  - **`lib/stacks/network/`** — `NetworkStack` (isolated VPC, subnets, and the
+    gateway/interface VPC endpoints)
+  - **`lib/stacks/database/`** — `DatabaseStack` (Aurora PostgreSQL Serverless
+    v2 cluster)
+  - **`lib/stacks/artifacts/`** — `ArtifactsStack` (TLS certificate bucket and
+    the Keycloak/aws-cli ECR repositories)
+  - **`lib/stacks/logging/`** — `LoggingStack` (CloudTrail audit trail, VPC flow
+    logs, S3 server access logs, and a CloudWatch security dashboard)
+  - **`lib/stacks/auth/`** — `AuthenticationStack` (Keycloak on ECS Fargate
+    behind an NLB; pulls its images from ECR by digest)
 - **`scripts/`** — Operational scripts run outside CDK.
   - **`scripts/upload-certs.ts`** — Discovers the Keycloak certificates bucket
     by its `keycloak:name` tag and uploads all files from `certs/`. Requires AWS
     credentials via environment variables (`AWS_ACCESS_KEY_ID`,
     `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`). Run with
     `npx tsx scripts/upload-certs.ts`.
+  - **`scripts/upload-images.ts`** — Mirrors the pinned Keycloak and aws-cli
+    container images (by digest) into the ECR repositories it discovers by
+    `keycloak:name` tag. Requires AWS credentials (as above) and a registry copy
+    tool — `skopeo` (default) or `docker` (set `IMAGE_COPY_TOOL=docker`). Must
+    run after `Keycloak-ArtifactsStack` (which creates the repositories) and
+    before `Keycloak-AuthenticationStack` (whose task definition pulls the
+    images by digest). Run with `npx tsx scripts/upload-images.ts`.
 - **`test/unit/`** — Vitest unit tests. CDK stack assertions use
   `aws-cdk-lib/assertions` (`Template.fromStack`).
 
@@ -56,10 +58,10 @@ The CDK CLI runs the app via `npx tsx` (configured in `cdk.json`).
 - **Test runner**: Vitest (not Jest). Config is in `vite.config.unit.ts`. Tests
   live in `test/unit/`.
 - **Security checks**: [cdk-nag](https://github.com/cdklabs/cdk-nag) with
-  `AwsSolutionsChecks` applied in `bin/aws-cdk-delivery-patterns.ts`. Runs
-  automatically during `cdk synth` — synthesis fails on unaddressed violations.
-  Use `NagSuppressions` to suppress findings that cannot be fixed in code;
-  always include a `reason`.
+  `AwsSolutionsChecks` applied in `bin/aws-cdk-keycloak.ts`. Runs automatically
+  during `cdk synth` — synthesis fails on unaddressed violations. Use
+  `NagSuppressions` to suppress findings that cannot be fixed in code; always
+  include a `reason`.
 - **Commit convention**: Conventional Commits enforced via commitlint + husky.
 - **Dependency updates**:
   [npm-check-updates](https://github.com/raineorshine/npm-check-updates) with

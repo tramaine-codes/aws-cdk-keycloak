@@ -14,13 +14,13 @@ import { UnknownError } from 'effect/Cause';
 import { packageDirectory } from 'package-directory';
 
 const client = new S3Client({ credentials: fromEnv() });
-const tag = 'keycloak:name';
+const tagName = 'keycloak:name';
 const tagValue = 'KeycloakCertificates';
 
 const hasTag = (
-  tags: ReadonlyArray<{ Key?: string; Value?: string }>,
+  tags: ReadonlyArray<{ readonly Key?: string; readonly Value?: string }>,
   tagValue: string
-) => Arr.some(tags, ({ Key, Value }) => Key === tag && Value === tagValue);
+) => Arr.some(tags, ({ Key, Value }) => Key === tagName && Value === tagValue);
 
 const rootDir = () =>
   Effect.gen(function* () {
@@ -42,6 +42,26 @@ const listFiles = (
     return Arr.map(files, (file) => path.join(dir, file));
   });
 
+const hasBucketTag = ({ Name: Bucket }: Bucket, tagValue: string) =>
+  Effect.tryPromise(() =>
+    client.send(new GetBucketTaggingCommand({ Bucket }))
+  ).pipe(
+    Effect.map(({ TagSet }) =>
+      Option.fromNullishOr(TagSet).pipe(
+        Option.andThen((tagSet) => hasTag(tagSet, tagValue)),
+        Option.getOrElse(() => false)
+      )
+    ),
+    Effect.catchTag('UnknownError', (error) =>
+      Match.value(error.cause).pipe(
+        Match.when({ name: 'NoSuchTagSet' }, () =>
+          Console.log(`no tags found for ${Bucket}`).pipe(Effect.as(false))
+        ),
+        Match.orElse(() => Effect.fail(error))
+      )
+    )
+  );
+
 const findBucketByTag = (tagValue: string) =>
   Stream.fromAsyncIterable(
     paginateListBuckets({ client }, {}),
@@ -54,32 +74,13 @@ const findBucketByTag = (tagValue: string) =>
         )
       )
     ),
-    Stream.filterEffect(({ Name: Bucket }) =>
-      Effect.tryPromise(() =>
-        client.send(new GetBucketTaggingCommand({ Bucket }))
-      ).pipe(
-        Effect.map(({ TagSet }) =>
-          Option.fromNullishOr(TagSet).pipe(
-            Option.andThen((tagSet) => hasTag(tagSet, tagValue)),
-            Option.getOrElse(() => false)
-          )
-        ),
-        Effect.catchTag('UnknownError', (error) =>
-          Match.value(error.cause).pipe(
-            Match.when({ name: 'NoSuchTagSet' }, () =>
-              Console.log(`no tags found for ${Bucket}`).pipe(Effect.as(false))
-            ),
-            Match.orElse(() => Effect.fail(error))
-          )
-        )
-      )
-    ),
+    Stream.filterEffect((bucket) => hasBucketTag(bucket, tagValue)),
     Stream.runHead,
     Effect.andThen((bucket) => Effect.fromOption(bucket)),
     Effect.andThen(({ Name }) => Effect.fromNullishOr(Name)),
     Effect.tapErrorTag('NoSuchElementError', () =>
       Console.log(
-        `no bucket found with tag named '${tag}' set to '${tagValue}'`
+        `no bucket found with tag named '${tagName}' set to '${tagValue}'`
       )
     )
   );
