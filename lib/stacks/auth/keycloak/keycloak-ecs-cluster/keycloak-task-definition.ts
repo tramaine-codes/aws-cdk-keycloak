@@ -148,6 +148,7 @@ export class KeycloakTaskDefinition extends Construct {
     logGroup: logs.ILogGroup
   ) => {
     const adminSecret = new secretsmanager.Secret(this, 'AdminSecret', {
+      description: 'Keycloak bootstrap admin username and password.',
       generateSecretString: {
         excludePunctuation: true,
         passwordLength: 32,

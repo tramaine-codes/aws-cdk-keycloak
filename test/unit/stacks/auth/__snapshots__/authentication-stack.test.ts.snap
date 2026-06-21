@@ -594,6 +594,7 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
         },
       },
       "Properties": {
+        "Description": "Keycloak bootstrap admin username and password.",
         "GenerateSecretString": {
           "ExcludePunctuation": true,
           "PasswordLength": 32,
