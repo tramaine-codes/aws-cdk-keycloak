@@ -23,7 +23,7 @@ export class AuditTrail extends Construct {
     encryptionKey.addToResourcePolicy(
       new iam.PolicyStatement({
         sid: 'CloudTrailConsumer',
-        actions: ['kms:GenerateDataKey*', 'kms:DescribeKey'],
+        actions: ['kms:DescribeKey', 'kms:GenerateDataKey*'],
         conditions: {
           StringLike: {
             'kms:EncryptionContext:aws:cloudtrail:arn': `arn:${stack.partition}:cloudtrail:*:${stack.account}:trail/*`,
@@ -37,11 +37,11 @@ export class AuditTrail extends Construct {
     encryptionKey.addToResourcePolicy(
       new iam.PolicyStatement({
         sid: 'S3DeliveryConsumer',
-        actions: ['kms:Decrypt', 'kms:GenerateDataKey*', 'kms:DescribeKey'],
+        actions: ['kms:Decrypt', 'kms:DescribeKey', 'kms:GenerateDataKey*'],
         conditions: {
           StringEquals: {
-            'kms:ViaService': `s3.${stack.region}.amazonaws.com`,
             'kms:CallerAccount': stack.account,
+            'kms:ViaService': `s3.${stack.region}.amazonaws.com`,
           },
         },
         principals: [new iam.AccountRootPrincipal()],

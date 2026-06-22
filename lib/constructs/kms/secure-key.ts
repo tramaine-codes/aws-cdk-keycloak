@@ -4,20 +4,21 @@ import * as cdk from 'aws-cdk-lib/core';
 import type { Construct } from 'constructs';
 
 const MANAGEMENT_ACTIONS = [
+  'kms:CancelKeyDeletion',
   'kms:Create*',
+  'kms:DeleteAlias',
   'kms:Describe*',
-  'kms:Enable*',
   'kms:Disable*',
+  'kms:Enable*',
   'kms:Get*',
   'kms:List*',
   'kms:Put*',
-  'kms:Update*',
   'kms:Revoke*',
+  'kms:RotateKeyOnDemand',
+  'kms:ScheduleKeyDeletion',
   'kms:Tag*',
   'kms:Untag*',
-  'kms:ScheduleKeyDeletion',
-  'kms:CancelKeyDeletion',
-  'kms:RotateKeyOnDemand',
+  'kms:Update*',
 ];
 
 export interface SecureKeyProps
@@ -26,6 +27,7 @@ export interface SecureKeyProps
 export class SecureKey extends kms.Key {
   constructor(scope: Construct, id: string, props?: SecureKeyProps) {
     super(scope, id, {
+      pendingWindow: cdk.Duration.days(7),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       ...props,
       enableKeyRotation: true,

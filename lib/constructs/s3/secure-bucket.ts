@@ -45,16 +45,16 @@ export class SecureBucket extends s3.Bucket {
       new iam.PolicyStatement({
         sid: 'AccountS3Access',
         actions: [
-          'kms:Encrypt',
           'kms:Decrypt',
+          'kms:DescribeKey',
+          'kms:Encrypt',
           'kms:GenerateDataKey*',
           'kms:ReEncrypt*',
-          'kms:DescribeKey',
         ],
         conditions: {
           StringEquals: {
-            'kms:ViaService': `s3.${stack.region}.amazonaws.com`,
             'kms:CallerAccount': stack.account,
+            'kms:ViaService': `s3.${stack.region}.amazonaws.com`,
           },
         },
         principals: [new iam.AccountRootPrincipal()],
@@ -85,8 +85,8 @@ export class SecureBucket extends s3.Bucket {
         actions: ['kms:Decrypt', 'kms:DescribeKey', 'kms:GenerateDataKey*'],
         conditions: {
           StringEquals: {
-            'kms:ViaService': `s3.${cdk.Stack.of(this).region}.amazonaws.com`,
             'kms:CallerAccount': cdk.Stack.of(this).account,
+            'kms:ViaService': `s3.${cdk.Stack.of(this).region}.amazonaws.com`,
           },
         },
         principals: [principal],

@@ -84,20 +84,21 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
           "Statement": [
             {
               "Action": [
+                "kms:CancelKeyDeletion",
                 "kms:Create*",
+                "kms:DeleteAlias",
                 "kms:Describe*",
-                "kms:Enable*",
                 "kms:Disable*",
+                "kms:Enable*",
                 "kms:Get*",
                 "kms:List*",
                 "kms:Put*",
-                "kms:Update*",
                 "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
                 "kms:Tag*",
                 "kms:Untag*",
-                "kms:ScheduleKeyDeletion",
-                "kms:CancelKeyDeletion",
-                "kms:RotateKeyOnDemand",
+                "kms:Update*",
               ],
               "Effect": "Allow",
               "Principal": {
@@ -119,11 +120,11 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
             },
             {
               "Action": [
-                "kms:Encrypt",
                 "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
                 "kms:GenerateDataKey*",
                 "kms:ReEncrypt*",
-                "kms:DescribeKey",
               ],
               "Condition": {
                 "StringEquals": {
@@ -152,6 +153,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
+        "PendingWindowInDays": 7,
       },
       "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Delete",
@@ -379,20 +381,21 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
           "Statement": [
             {
               "Action": [
+                "kms:CancelKeyDeletion",
                 "kms:Create*",
+                "kms:DeleteAlias",
                 "kms:Describe*",
-                "kms:Enable*",
                 "kms:Disable*",
+                "kms:Enable*",
                 "kms:Get*",
                 "kms:List*",
                 "kms:Put*",
-                "kms:Update*",
                 "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
                 "kms:Tag*",
                 "kms:Untag*",
-                "kms:ScheduleKeyDeletion",
-                "kms:CancelKeyDeletion",
-                "kms:RotateKeyOnDemand",
+                "kms:Update*",
               ],
               "Effect": "Allow",
               "Principal": {
@@ -447,6 +450,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
+        "PendingWindowInDays": 7,
       },
       "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Delete",
@@ -513,20 +517,21 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
           "Statement": [
             {
               "Action": [
+                "kms:CancelKeyDeletion",
                 "kms:Create*",
+                "kms:DeleteAlias",
                 "kms:Describe*",
-                "kms:Enable*",
                 "kms:Disable*",
+                "kms:Enable*",
                 "kms:Get*",
                 "kms:List*",
                 "kms:Put*",
-                "kms:Update*",
                 "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
                 "kms:Tag*",
                 "kms:Untag*",
-                "kms:ScheduleKeyDeletion",
-                "kms:CancelKeyDeletion",
-                "kms:RotateKeyOnDemand",
+                "kms:Update*",
               ],
               "Effect": "Allow",
               "Principal": {
@@ -581,6 +586,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
+        "PendingWindowInDays": 7,
       },
       "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Delete",

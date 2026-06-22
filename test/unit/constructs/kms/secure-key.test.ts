@@ -21,13 +21,24 @@ describe('SecureKey', () => {
     });
   });
 
+  test('sets the pending deletion window to 7 days', () => {
+    template.hasResourceProperties('AWS::KMS::Key', {
+      PendingWindowInDays: 7,
+    });
+  });
+
   test('restricts the base key policy to account-root management only', () => {
     template.hasResourceProperties('AWS::KMS::Key', {
       KeyPolicy: Match.objectLike({
         Statement: [
           Match.objectLike({
             Sid: 'KeyManagement',
-            Action: Match.arrayWith(['kms:Create*', 'kms:ScheduleKeyDeletion']),
+            Action: Match.arrayWith([
+              'kms:CancelKeyDeletion',
+              'kms:Create*',
+              'kms:DeleteAlias',
+              'kms:ScheduleKeyDeletion',
+            ]),
           }),
         ],
       }),

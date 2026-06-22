@@ -16,6 +16,7 @@ TypeScript via `tsx` (no compile step needed at runtime).
   - **`lib/constructs/ecr/`** — `SecureEcrRepository`
   - **`lib/constructs/kms/`** — `SecureKey`
   - **`lib/constructs/lambda/`** — `SecureNodejsFunction`
+  - **`lib/constructs/rds/`** — `SecureDatabaseCluster`
   - **`lib/constructs/s3/`** — `SecureBucket`, `SecureLogBucket`
 - **`lib/stacks/`** — CDK stacks, one directory per domain. The stack lives at
   the top of each directory; its composing constructs live in named
@@ -115,6 +116,8 @@ npx cdk deploy
 
 ## Git Conventions
 
+- Always show the user the diff and wait for explicit approval before
+  committing.
 - Do not reference Claude, Claude Code, or AI assistance in commit messages
 - Use Conventional Commits prefixes:
   - `build:` — changes to the build system or external dependencies
