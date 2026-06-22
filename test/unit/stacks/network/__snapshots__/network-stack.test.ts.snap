@@ -726,9 +726,6 @@ exports[`NetworkStack > composition matches snapshot 1`] = `
                     ],
                   },
                 },
-                "StringEquals": {
-                  "kms:CallerAccount": "000000000000",
-                },
               },
               "Effect": "Allow",
               "Principal": {

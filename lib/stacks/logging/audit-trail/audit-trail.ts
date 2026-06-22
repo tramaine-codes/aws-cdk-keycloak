@@ -28,7 +28,7 @@ export class AuditTrail extends Construct {
     }
     cdk.Tags.of(encryptionKey).add('keycloak:name', 'AuditTrailKey');
 
-    const { account } = cdk.Stack.of(this);
+    const { account, partition } = cdk.Stack.of(this);
 
     bucket.addToResourcePolicy(
       new iam.PolicyStatement({
@@ -65,11 +65,20 @@ export class AuditTrail extends Construct {
 
     bucket.grantKeyAccess(
       new iam.PolicyStatement({
-        sid: 'CloudTrailConsumer',
-        actions: ['kms:DescribeKey', 'kms:GenerateDataKey*'],
+        sid: 'CloudTrailDescribeKey',
+        actions: ['kms:DescribeKey'],
+        principals: [new iam.ServicePrincipal('cloudtrail.amazonaws.com')],
+        resources: ['*'],
+      })
+    );
+
+    bucket.grantKeyAccess(
+      new iam.PolicyStatement({
+        sid: 'CloudTrailEncrypt',
+        actions: ['kms:GenerateDataKey*'],
         conditions: {
-          StringEquals: {
-            'kms:CallerAccount': account,
+          StringLike: {
+            'kms:EncryptionContext:aws:cloudtrail:arn': `arn:${partition}:cloudtrail:*:${account}:trail/*`,
           },
         },
         principals: [new iam.ServicePrincipal('cloudtrail.amazonaws.com')],

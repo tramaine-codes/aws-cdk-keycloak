@@ -205,13 +205,30 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
               "Sid": "AccountS3Access",
             },
             {
-              "Action": [
-                "kms:DescribeKey",
-                "kms:GenerateDataKey*",
-              ],
+              "Action": "kms:DescribeKey",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudtrail.amazonaws.com",
+              },
+              "Resource": "*",
+              "Sid": "CloudTrailDescribeKey",
+            },
+            {
+              "Action": "kms:GenerateDataKey*",
               "Condition": {
-                "StringEquals": {
-                  "kms:CallerAccount": "000000000000",
+                "StringLike": {
+                  "kms:EncryptionContext:aws:cloudtrail:arn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":cloudtrail:*:000000000000:trail/*",
+                      ],
+                    ],
+                  },
                 },
               },
               "Effect": "Allow",
@@ -219,7 +236,7 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
                 "Service": "cloudtrail.amazonaws.com",
               },
               "Resource": "*",
-              "Sid": "CloudTrailConsumer",
+              "Sid": "CloudTrailEncrypt",
             },
           ],
           "Version": "2012-10-17",
@@ -497,9 +514,6 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
                       ],
                     ],
                   },
-                },
-                "StringEquals": {
-                  "kms:CallerAccount": "000000000000",
                 },
               },
               "Effect": "Allow",

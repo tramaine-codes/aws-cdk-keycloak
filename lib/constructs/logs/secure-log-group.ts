@@ -37,9 +37,6 @@ export class SecureLogGroup extends logs.LogGroup {
           ArnLike: {
             'kms:EncryptionContext:aws:logs:arn': `arn:${partition}:logs:${region}:${account}:log-group:*`,
           },
-          StringEquals: {
-            'kms:CallerAccount': account,
-          },
         },
         principals: [new iam.ServicePrincipal(`logs.${region}.amazonaws.com`)],
         resources: ['*'],
