@@ -1,7 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import type * as kms from 'aws-cdk-lib/aws-kms';
 import type { Construct } from 'constructs';
 import { SecureKey } from '../kms/secure-key.js';
 
