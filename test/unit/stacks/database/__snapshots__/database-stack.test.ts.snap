@@ -42,7 +42,7 @@ exports[`DatabaseStack > composition matches snapshot 1`] = `
         "EngineVersion": "17.9",
         "KmsKeyId": {
           "Fn::GetAtt": [
-            "KeycloakDatabaseClusterStorageEncryptionKeyDC09CAF9",
+            "KeycloakDatabaseClusterKeycloakClusterKey5AA12C07",
             "Arn",
           ],
         },
@@ -87,6 +87,100 @@ exports[`DatabaseStack > composition matches snapshot 1`] = `
       },
       "Type": "AWS::RDS::DBCluster",
       "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakDatabaseClusterKeycloakClusterKey5AA12C07": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:CancelKeyDeletion",
+                "kms:Create*",
+                "kms:DeleteAlias",
+                "kms:Describe*",
+                "kms:Disable*",
+                "kms:Enable*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
+                "kms:Tag*",
+                "kms:Untag*",
+                "kms:Update*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "KeyManagement",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:GenerateDataKey*",
+                "kms:ReEncrypt*",
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "kms:CallerAccount": "000000000000",
+                  "kms:ViaService": "rds.us-east-1.amazonaws.com",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "AccountRdsAccess",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PendingWindowInDays": 7,
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakDatabaseClusterKeycloakClusterKeyAlias7CCB6FC9": {
+      "Properties": {
+        "AliasName": "alias/keycloak/rds/keycloak-cluster",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakDatabaseClusterKeycloakClusterKey5AA12C07",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
     },
     "KeycloakDatabaseClusterKeycloakClusterSecret7BA40C9D": {
       "DeletionPolicy": "Delete",
@@ -178,66 +272,6 @@ exports[`DatabaseStack > composition matches snapshot 1`] = `
         "PubliclyAccessible": false,
       },
       "Type": "AWS::RDS::DBInstance",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "KeycloakDatabaseClusterStorageEncryptionKeyAliasD1DCE007": {
-      "Properties": {
-        "AliasName": "alias/keycloak/rds/keycloak-cluster",
-        "TargetKeyId": {
-          "Fn::GetAtt": [
-            "KeycloakDatabaseClusterStorageEncryptionKeyDC09CAF9",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::KMS::Alias",
-    },
-    "KeycloakDatabaseClusterStorageEncryptionKeyDC09CAF9": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "EnableKeyRotation": true,
-        "KeyPolicy": {
-          "Statement": [
-            {
-              "Action": [
-                "kms:Create*",
-                "kms:Describe*",
-                "kms:Enable*",
-                "kms:Disable*",
-                "kms:Get*",
-                "kms:List*",
-                "kms:Put*",
-                "kms:Update*",
-                "kms:Revoke*",
-                "kms:Tag*",
-                "kms:Untag*",
-                "kms:ScheduleKeyDeletion",
-                "kms:CancelKeyDeletion",
-                "kms:RotateKeyOnDemand",
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::000000000000:root",
-                    ],
-                  ],
-                },
-              },
-              "Resource": "*",
-              "Sid": "KeyManagement",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Delete",
     },
   },
