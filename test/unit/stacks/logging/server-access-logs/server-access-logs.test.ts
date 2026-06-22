@@ -4,10 +4,9 @@ import { describe, test } from 'vitest';
 import { ServerAccessLogs } from '../../../../../lib/stacks/logging/server-access-logs/server-access-logs.js';
 
 describe('ServerAccessLogs', () => {
+  const env = { account: '000000000000', region: 'us-east-1' };
   const app = new cdk.App();
-  const stack = new cdk.Stack(app, 'TestStack', {
-    env: { account: '123456789012', region: 'us-east-1' },
-  });
+  const stack = new cdk.Stack(app, 'TestStack', { env });
   new ServerAccessLogs(stack, 'ServerAccessLogs');
   const template = Template.fromStack(stack);
 

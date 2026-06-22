@@ -3,31 +3,33 @@ import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import * as cloudwatchActions from 'aws-cdk-lib/aws-cloudwatch-actions';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambdaNodejs from 'aws-cdk-lib/aws-lambda-nodejs';
-import * as logs from 'aws-cdk-lib/aws-logs';
 import type * as sns from 'aws-cdk-lib/aws-sns';
 import type { Construct } from 'constructs';
+import { SecureLogGroup } from '../logs/secure-log-group.js';
 
 export interface SecureNodejsFunctionProps
   extends Omit<lambdaNodejs.NodejsFunctionProps, 'logGroup'> {
   readonly alarmTopic: sns.ITopic;
+  readonly logGroupKeyAlias: string;
 }
 
 export class SecureNodejsFunction extends lambdaNodejs.NodejsFunction {
   constructor(scope: Construct, id: string, props: SecureNodejsFunctionProps) {
+    const { alarmTopic, logGroupKeyAlias: keyAlias, ...functionProps } = props;
+
     super(scope, id, {
       bundling: { sourceMap: true },
       memorySize: cdk.Size.mebibytes(512).toMebibytes(),
       runtime: lambda.Runtime.NODEJS_24_X,
       tracing: lambda.Tracing.ACTIVE,
-      ...props,
+      ...functionProps,
       environment: {
-        ...props.environment,
+        ...functionProps.environment,
         AWS_USE_FIPS_ENDPOINT: 'true',
         NODE_OPTIONS: '--enable-source-maps',
       },
-      logGroup: new logs.LogGroup(scope, `${id}LogGroup`, {
-        removalPolicy: cdk.RemovalPolicy.DESTROY,
-        retention: logs.RetentionDays.ONE_WEEK,
+      logGroup: new SecureLogGroup(scope, `${id}LogGroup`, {
+        keyAlias,
       }),
     });
 

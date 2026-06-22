@@ -4,10 +4,9 @@ import { describe, expect, test } from 'vitest';
 import { AuditTrail } from '../../../../../lib/stacks/logging/audit-trail/audit-trail.js';
 
 describe('AuditTrail', () => {
+  const env = { account: '000000000000', region: 'us-east-1' };
   const app = new cdk.App();
-  const stack = new cdk.Stack(app, 'TestStack', {
-    env: { account: '123456789012', region: 'us-east-1' },
-  });
+  const stack = new cdk.Stack(app, 'TestStack', { env });
   new AuditTrail(stack, 'AuditTrail');
   const template = Template.fromStack(stack);
 

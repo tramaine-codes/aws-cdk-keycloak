@@ -1,57 +1,19 @@
 import * as cdk from 'aws-cdk-lib';
 import * as cloudtrail from 'aws-cdk-lib/aws-cloudtrail';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as logs from 'aws-cdk-lib/aws-logs';
-import * as s3 from 'aws-cdk-lib/aws-s3';
+import type * as logs from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
-import { SecureKey } from '../../../constructs/kms/secure-key.js';
+import { SecureLogGroup } from '../../../constructs/logs/secure-log-group.js';
 import { SecureLogBucket } from '../../../constructs/s3/secure-log-bucket.js';
 
 export class AuditTrail extends Construct {
-  readonly cloudTrailLogGroup: logs.ILogGroup;
+  readonly logGroup: logs.ILogGroup;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const stack = cdk.Stack.of(this);
-
-    const encryptionKey = new SecureKey(this, 'Key', {
-      alias: 'alias/keycloak/cloud-trail/audit-trail',
-    });
-    cdk.Tags.of(encryptionKey).add('keycloak:name', 'AuditTrailKey');
-
-    encryptionKey.addToResourcePolicy(
-      new iam.PolicyStatement({
-        sid: 'CloudTrailConsumer',
-        actions: ['kms:DescribeKey', 'kms:GenerateDataKey*'],
-        conditions: {
-          StringLike: {
-            'kms:EncryptionContext:aws:cloudtrail:arn': `arn:${stack.partition}:cloudtrail:*:${stack.account}:trail/*`,
-          },
-        },
-        principals: [new iam.ServicePrincipal('cloudtrail.amazonaws.com')],
-        resources: ['*'],
-      })
-    );
-
-    encryptionKey.addToResourcePolicy(
-      new iam.PolicyStatement({
-        sid: 'S3DeliveryConsumer',
-        actions: ['kms:Decrypt', 'kms:DescribeKey', 'kms:GenerateDataKey*'],
-        conditions: {
-          StringEquals: {
-            'kms:CallerAccount': stack.account,
-            'kms:ViaService': `s3.${stack.region}.amazonaws.com`,
-          },
-        },
-        principals: [new iam.AccountRootPrincipal()],
-        resources: ['*'],
-      })
-    );
-
     const bucket = new SecureLogBucket(this, 'Bucket', {
-      encryption: s3.BucketEncryption.KMS,
-      encryptionKey,
+      keyAlias: 'alias/keycloak/cloud-trail/audit-trail',
       lifecycleRules: [
         {
           expiration: cdk.Duration.days(7),
@@ -59,6 +21,14 @@ export class AuditTrail extends Construct {
       ],
     });
     cdk.Tags.of(bucket).add('keycloak:name', 'AuditTrail');
+
+    const { encryptionKey } = bucket;
+    if (!encryptionKey) {
+      throw new Error('AuditTrail requires a SecureLogBucket with a keyAlias');
+    }
+    cdk.Tags.of(encryptionKey).add('keycloak:name', 'AuditTrailKey');
+
+    const { account } = cdk.Stack.of(this);
 
     bucket.addToResourcePolicy(
       new iam.PolicyStatement({
@@ -78,21 +48,32 @@ export class AuditTrail extends Construct {
       })
     );
 
-    const cloudTrailLogGroup = new logs.LogGroup(this, 'LogGroup', {
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      retention: logs.RetentionDays.ONE_WEEK,
+    this.logGroup = new SecureLogGroup(this, 'LogGroup', {
+      keyAlias: 'alias/keycloak/logs/audit-trail',
     });
 
     const trail = new cloudtrail.Trail(this, 'Resource', {
       bucket,
-      cloudWatchLogGroup: cloudTrailLogGroup,
+      cloudWatchLogGroup: this.logGroup,
       enableFileValidation: true,
       encryptionKey,
       isMultiRegionTrail: false,
       sendToCloudWatchLogs: true,
-      trailName: 'keycloak-audit',
     });
     cdk.Tags.of(trail).add('keycloak:name', 'AuditTrail');
-    this.cloudTrailLogGroup = cloudTrailLogGroup;
+
+    bucket.grantKeyAccess(
+      new iam.PolicyStatement({
+        sid: 'CloudTrailConsumer',
+        actions: ['kms:DescribeKey', 'kms:GenerateDataKey*'],
+        conditions: {
+          StringEquals: {
+            'kms:CallerAccount': account,
+          },
+        },
+        principals: [new iam.ServicePrincipal('cloudtrail.amazonaws.com')],
+        resources: ['*'],
+      })
+    );
   }
 }

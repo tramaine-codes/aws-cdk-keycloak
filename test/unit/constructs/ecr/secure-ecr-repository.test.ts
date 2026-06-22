@@ -5,7 +5,7 @@ import { SecureEcrRepository } from '../../../../lib/constructs/ecr/secure-ecr-r
 
 describe('SecureEcrRepository', () => {
   const stack = new cdk.Stack();
-  new SecureEcrRepository(stack, 'Repo', { alias: 'alias/test/repo' });
+  new SecureEcrRepository(stack, 'Repo', { keyAlias: 'alias/test/repo' });
   const template = Template.fromStack(stack);
 
   test('scans images on push', () => {

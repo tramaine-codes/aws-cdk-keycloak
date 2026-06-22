@@ -9,18 +9,18 @@ export interface SecureDatabaseClusterProps
     rds.DatabaseClusterProps,
     'storageEncrypted' | 'storageEncryptionKey'
   > {
-  readonly alias: string;
+  readonly keyAlias: string;
 }
 
 export class SecureDatabaseCluster extends rds.DatabaseCluster {
   constructor(scope: Construct, id: string, props: SecureDatabaseClusterProps) {
-    const { alias, ...clusterProps } = props;
+    const { keyAlias: alias, ...clusterProps } = props;
 
     const storageEncryptionKey = new SecureKey(scope, `${id}Key`, { alias });
 
     super(scope, id, { ...clusterProps, storageEncryptionKey });
 
-    const stack = cdk.Stack.of(this);
+    const { account, region } = cdk.Stack.of(this);
 
     storageEncryptionKey.addToResourcePolicy(
       new iam.PolicyStatement({
@@ -34,8 +34,8 @@ export class SecureDatabaseCluster extends rds.DatabaseCluster {
         ],
         conditions: {
           StringEquals: {
-            'kms:CallerAccount': stack.account,
-            'kms:ViaService': `rds.${stack.region}.amazonaws.com`,
+            'kms:CallerAccount': account,
+            'kms:ViaService': `rds.${region}.amazonaws.com`,
           },
         },
         principals: [new iam.AccountRootPrincipal()],

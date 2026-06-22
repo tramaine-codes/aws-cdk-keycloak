@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import type * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
-import { SecureBucket } from '../../constructs/s3/secure-bucket.js';
+import { KeycloakCertificates } from './keycloak-certificates/keycloak-certificates.js';
 import { KeycloakEcrRepositories } from './keycloak-ecr-repositories/keycloak-ecr-repositories.js';
 
 interface ArtifactsStackProps extends cdk.StackProps {
@@ -15,19 +15,12 @@ export class ArtifactsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ArtifactsStackProps) {
     super(scope, id, props);
 
-    this.keycloakCertificatesBucket = new SecureBucket(
+    const keycloakCertificates = new KeycloakCertificates(
       this,
-      'CertificatesBucket',
-      {
-        alias: 'alias/keycloak/s3/certificates-bucket',
-        serverAccessLogsBucket: props.serverAccessLogsBucket,
-        serverAccessLogsPrefix: 'keycloak-certificates-bucket',
-      }
+      'KeycloakCertificates',
+      { serverAccessLogsBucket: props.serverAccessLogsBucket }
     );
-    cdk.Tags.of(this.keycloakCertificatesBucket).add(
-      'keycloak:name',
-      'KeycloakCertificates'
-    );
+    this.keycloakCertificatesBucket = keycloakCertificates.bucket;
 
     this.keycloakEcrRepositories = new KeycloakEcrRepositories(
       this,

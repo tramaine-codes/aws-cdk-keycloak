@@ -223,7 +223,7 @@ exports[`NetworkStack > composition matches snapshot 1`] = `
         },
         "LogDestinationType": "cloud-watch-logs",
         "LogGroupName": {
-          "Ref": "KeycloakVpcCloudWatchFlowLogLogGroupB7050F50",
+          "Ref": "KeycloakVpcFlowLogGroup5337BA2B",
         },
         "ResourceId": {
           "Ref": "KeycloakVpc3B97A761",
@@ -275,7 +275,7 @@ exports[`NetworkStack > composition matches snapshot 1`] = `
               "Effect": "Allow",
               "Resource": {
                 "Fn::GetAtt": [
-                  "KeycloakVpcCloudWatchFlowLogLogGroupB7050F50",
+                  "KeycloakVpcFlowLogGroup5337BA2B",
                   "Arn",
                 ],
               },
@@ -291,20 +291,6 @@ exports[`NetworkStack > composition matches snapshot 1`] = `
         ],
       },
       "Type": "AWS::IAM::Policy",
-    },
-    "KeycloakVpcCloudWatchFlowLogLogGroupB7050F50": {
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "RetentionInDays": 731,
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "Keycloak-NetworkStack/KeycloakVpc/Vpc/CloudWatchFlowLog",
-          },
-        ],
-      },
-      "Type": "AWS::Logs::LogGroup",
-      "UpdateReplacePolicy": "Retain",
     },
     "KeycloakVpcCloudWatchLogsEndpoint3256EE28": {
       "Properties": {
@@ -660,6 +646,116 @@ exports[`NetworkStack > composition matches snapshot 1`] = `
         },
       },
       "Type": "AWS::EC2::Subnet",
+    },
+    "KeycloakVpcFlowLogGroup5337BA2B": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "KmsKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakVpcFlowLogGroupKey16A19AC2",
+            "Arn",
+          ],
+        },
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakVpcFlowLogGroupKey16A19AC2": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:CancelKeyDeletion",
+                "kms:Create*",
+                "kms:DeleteAlias",
+                "kms:Describe*",
+                "kms:Disable*",
+                "kms:Enable*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
+                "kms:Tag*",
+                "kms:Untag*",
+                "kms:Update*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "KeyManagement",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:GenerateDataKey*",
+                "kms:ReEncrypt*",
+              ],
+              "Condition": {
+                "ArnLike": {
+                  "kms:EncryptionContext:aws:logs:arn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:us-east-1:000000000000:log-group:*",
+                      ],
+                    ],
+                  },
+                },
+                "StringEquals": {
+                  "kms:CallerAccount": "000000000000",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "logs.us-east-1.amazonaws.com",
+              },
+              "Resource": "*",
+              "Sid": "CloudWatchLogsAccess",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PendingWindowInDays": 7,
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakVpcFlowLogGroupKeyAliasF1ACEE8F": {
+      "Properties": {
+        "AliasName": "alias/keycloak/logs/vpc-flow",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakVpcFlowLogGroupKey16A19AC2",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
     },
     "KeycloakVpcIGW8D57925B": {
       "Properties": {

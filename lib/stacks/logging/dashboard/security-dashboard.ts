@@ -1,16 +1,18 @@
 import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
-import type * as logs from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
+import type { AuditTrail } from '../audit-trail/audit-trail.js';
 
 interface SecurityDashboardProps {
-  readonly cloudTrailLogGroup: logs.ILogGroup;
+  readonly auditTrail: AuditTrail;
 }
 
 export class SecurityDashboard extends Construct {
   constructor(scope: Construct, id: string, props: SecurityDashboardProps) {
     super(scope, id);
 
-    const { cloudTrailLogGroup } = props;
+    const {
+      auditTrail: { logGroup: cloudTrailLogGroup },
+    } = props;
 
     new cloudwatch.Dashboard(this, 'Resource', {
       dashboardName: 'Keycloak-CloudTrail',

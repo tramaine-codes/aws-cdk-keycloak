@@ -16,6 +16,7 @@ TypeScript via `tsx` (no compile step needed at runtime).
   - **`lib/constructs/ecr/`** — `SecureEcrRepository`
   - **`lib/constructs/kms/`** — `SecureKey`
   - **`lib/constructs/lambda/`** — `SecureNodejsFunction`
+  - **`lib/constructs/logs/`** — `SecureLogGroup`
   - **`lib/constructs/rds/`** — `SecureDatabaseCluster`
   - **`lib/constructs/s3/`** — `SecureBucket`, `SecureLogBucket`
 - **`lib/stacks/`** — CDK stacks, one directory per domain. The stack lives at

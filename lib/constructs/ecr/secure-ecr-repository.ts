@@ -10,15 +10,12 @@ export interface SecureEcrRepositoryProps
     ecr.RepositoryProps,
     'encryption' | 'encryptionKey' | 'imageScanOnPush' | 'imageTagMutability'
   > {
-  readonly alias: string;
+  readonly keyAlias: string;
 }
 
 export class SecureEcrRepository extends ecr.Repository {
-  readonly encryptionKey: kms.IKey;
-
   constructor(scope: Construct, id: string, props: SecureEcrRepositoryProps) {
-    const { alias, ...repositoryProps } = props;
-
+    const { keyAlias: alias, ...repositoryProps } = props;
     const encryptionKey = new SecureKey(scope, `${id}Key`, { alias });
 
     super(scope, id, {
@@ -32,9 +29,7 @@ export class SecureEcrRepository extends ecr.Repository {
       imageTagMutability: ecr.TagMutability.IMMUTABLE,
     });
 
-    this.encryptionKey = encryptionKey;
-
-    const stack = cdk.Stack.of(this);
+    const { account, region } = cdk.Stack.of(this);
 
     encryptionKey.addToResourcePolicy(
       new iam.PolicyStatement({
@@ -48,8 +43,8 @@ export class SecureEcrRepository extends ecr.Repository {
         ],
         conditions: {
           StringEquals: {
-            'kms:CallerAccount': stack.account,
-            'kms:ViaService': `ecr.${stack.region}.amazonaws.com`,
+            'kms:CallerAccount': account,
+            'kms:ViaService': `ecr.${region}.amazonaws.com`,
           },
         },
         principals: [new iam.AccountRootPrincipal()],

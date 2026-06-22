@@ -2,11 +2,12 @@ import * as cdk from 'aws-cdk-lib';
 import type * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as logs from 'aws-cdk-lib/aws-logs';
+import type * as logs from 'aws-cdk-lib/aws-logs';
 import type * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
+import { SecureLogGroup } from '../../../../constructs/logs/secure-log-group.js';
 import type { KeycloakEcrRepositories } from '../../../artifacts/keycloak-ecr-repositories/keycloak-ecr-repositories.js';
 import type { KeycloakCluster } from '../../../database/keycloak-cluster/keycloak-cluster.js';
 
@@ -57,9 +58,8 @@ export class KeycloakTaskDefinition extends Construct {
 
     this.taskDefinition.addVolume({ name: this.certsVolumeName });
 
-    const logGroup = new logs.LogGroup(this, 'LogGroup', {
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      retention: logs.RetentionDays.ONE_WEEK,
+    const logGroup = new SecureLogGroup(this, 'LogGroup', {
+      keyAlias: 'alias/keycloak/logs/keycloak-task',
     });
 
     const initContainer = this.addInitContainer(

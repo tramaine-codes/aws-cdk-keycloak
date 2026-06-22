@@ -13,7 +13,7 @@ describe('SecureBucket', () => {
     'access-logs'
   );
   new SecureBucket(stack, 'Bucket', {
-    alias: 'alias/test/bucket',
+    keyAlias: 'alias/test/bucket',
     serverAccessLogsBucket,
   });
   const template = Template.fromStack(stack);

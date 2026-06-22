@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import type * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
+import { SecureLogGroup } from '../../../constructs/logs/secure-log-group.js';
 import { KeycloakVpcEndpoints } from './keycloak-vpc-endpoints.js';
 
 const SubnetName = {
@@ -26,12 +27,6 @@ export class KeycloakVpc extends Construct {
     this.vpc = new ec2.Vpc(this, 'Vpc', {
       enableDnsHostnames: true,
       enableDnsSupport: true,
-      // flowLogs: {
-      //   S3: {
-      //     destination: ec2.FlowLogDestination.toS3(props.flowLogsBucket),
-      //     trafficType: ec2.FlowLogTrafficType.ALL,
-      //   },
-      // },
       ipAddresses: ec2.IpAddresses.cidr('10.16.0.0/16'),
       maxAzs: 2,
       restrictDefaultSecurityGroup: true,
@@ -63,8 +58,11 @@ export class KeycloakVpc extends Construct {
     // biome-ignore lint/style/noNonNullAssertion: defaultChild is guaranteed for L2 constructs backed by a single CFN resource.
     cdk.Tags.of(this.vpc.node.defaultChild!).add('keycloak:name', 'NetworkVpc');
 
+    const flowLogGroup = new SecureLogGroup(this, 'FlowLogGroup', {
+      keyAlias: 'alias/keycloak/logs/vpc-flow',
+    });
     this.vpc.addFlowLog('CloudWatchFlowLog', {
-      destination: ec2.FlowLogDestination.toCloudWatchLogs(),
+      destination: ec2.FlowLogDestination.toCloudWatchLogs(flowLogGroup),
       trafficType: ec2.FlowLogTrafficType.ALL,
     });
     this.vpc.addFlowLog('S3FlowLog', {

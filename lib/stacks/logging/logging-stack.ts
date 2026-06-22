@@ -13,19 +13,16 @@ export class LoggingStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: cdk.StackProps) {
     super(scope, id, props);
 
-    const { cloudTrailLogGroup } = new AuditTrail(this, 'AuditTrail');
+    const flowLogs = new FlowLogs(this, 'FlowLogs');
+    this.flowLogsBucket = flowLogs.bucket;
 
-    const { bucket: flowLogsBucket } = new FlowLogs(this, 'FlowLogs');
-    this.flowLogsBucket = flowLogsBucket;
+    const serverAccessLogs = new ServerAccessLogs(this, 'ServerAccessLogs');
+    this.serverAccessLogsBucket = serverAccessLogs.bucket;
 
-    const { bucket: serverAccessLogsBucket } = new ServerAccessLogs(
-      this,
-      'ServerAccessLogs'
-    );
-    this.serverAccessLogsBucket = serverAccessLogsBucket;
+    const auditTrail = new AuditTrail(this, 'AuditTrail');
 
     new SecurityDashboard(this, 'SecurityDashboard', {
-      cloudTrailLogGroup,
+      auditTrail,
     });
   }
 }

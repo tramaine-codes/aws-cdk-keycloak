@@ -10,14 +10,70 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
     },
   },
   "Resources": {
-    "CertificatesBucketAutoDeleteObjectsCustomResource6C632624": {
+    "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+      "DependsOn": [
+        "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": "cdk-hnb659fds-assets-000000000000-us-east-1",
+          "S3Key": "HASH.zip",
+        },
+        "Description": {
+          "Fn::Join": [
+            "",
+            [
+              "Lambda function for auto-deleting objects in ",
+              {
+                "Ref": "KeycloakCertificatesBucketFF41C8EF",
+              },
+              " S3 bucket.",
+            ],
+          ],
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs24.x",
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "KeycloakCertificatesBucketAutoDeleteObjectsCustomResource2DF5EA46": {
       "DeletionPolicy": "Delete",
       "DependsOn": [
-        "CertificatesBucketPolicy11DC3445",
+        "KeycloakCertificatesBucketPolicyC66ED0EF",
       ],
       "Properties": {
         "BucketName": {
-          "Ref": "CertificatesBucketE5F004DB",
+          "Ref": "KeycloakCertificatesBucketFF41C8EF",
         },
         "ServiceToken": {
           "Fn::GetAtt": [
@@ -29,7 +85,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
       "Type": "Custom::S3AutoDeleteObjects",
       "UpdateReplacePolicy": "Delete",
     },
-    "CertificatesBucketE5F004DB": {
+    "KeycloakCertificatesBucketFF41C8EF": {
       "DeletionPolicy": "Delete",
       "Properties": {
         "BucketEncryption": {
@@ -38,7 +94,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
               "ServerSideEncryptionByDefault": {
                 "KMSMasterKeyID": {
                   "Fn::GetAtt": [
-                    "CertificatesBucketKey349C7E09",
+                    "KeycloakCertificatesBucketKeyCA6DD9D0",
                     "Arn",
                   ],
                 },
@@ -76,7 +132,19 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Delete",
     },
-    "CertificatesBucketKey349C7E09": {
+    "KeycloakCertificatesBucketKeyAliasCC9C6286": {
+      "Properties": {
+        "AliasName": "alias/keycloak/s3/certificates-bucket",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakCertificatesBucketKeyCA6DD9D0",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "KeycloakCertificatesBucketKeyCA6DD9D0": {
       "DeletionPolicy": "Delete",
       "Properties": {
         "EnableKeyRotation": true,
@@ -158,22 +226,10 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
       "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Delete",
     },
-    "CertificatesBucketKeyAlias9D798D3B": {
-      "Properties": {
-        "AliasName": "alias/keycloak/s3/certificates-bucket",
-        "TargetKeyId": {
-          "Fn::GetAtt": [
-            "CertificatesBucketKey349C7E09",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::KMS::Alias",
-    },
-    "CertificatesBucketPolicy11DC3445": {
+    "KeycloakCertificatesBucketPolicyC66ED0EF": {
       "Properties": {
         "Bucket": {
-          "Ref": "CertificatesBucketE5F004DB",
+          "Ref": "KeycloakCertificatesBucketFF41C8EF",
         },
         "PolicyDocument": {
           "Statement": [
@@ -191,7 +247,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "CertificatesBucketE5F004DB",
+                    "KeycloakCertificatesBucketFF41C8EF",
                     "Arn",
                   ],
                 },
@@ -201,7 +257,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "CertificatesBucketE5F004DB",
+                          "KeycloakCertificatesBucketFF41C8EF",
                           "Arn",
                         ],
                       },
@@ -230,7 +286,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "CertificatesBucketE5F004DB",
+                    "KeycloakCertificatesBucketFF41C8EF",
                     "Arn",
                   ],
                 },
@@ -240,7 +296,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "CertificatesBucketE5F004DB",
+                          "KeycloakCertificatesBucketFF41C8EF",
                           "Arn",
                         ],
                       },
@@ -256,7 +312,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
                 "StringNotEqualsIfExists": {
                   "s3:x-amz-server-side-encryption-aws-kms-key-id": {
                     "Fn::GetAtt": [
-                      "CertificatesBucketKey349C7E09",
+                      "KeycloakCertificatesBucketKeyCA6DD9D0",
                       "Arn",
                     ],
                   },
@@ -272,7 +328,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
                   [
                     {
                       "Fn::GetAtt": [
-                        "CertificatesBucketE5F004DB",
+                        "KeycloakCertificatesBucketFF41C8EF",
                         "Arn",
                       ],
                     },
@@ -286,62 +342,6 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
         },
       },
       "Type": "AWS::S3::BucketPolicy",
-    },
-    "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
-      "DependsOn": [
-        "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
-      ],
-      "Properties": {
-        "Code": {
-          "S3Bucket": "cdk-hnb659fds-assets-000000000000-us-east-1",
-          "S3Key": "HASH.zip",
-        },
-        "Description": {
-          "Fn::Join": [
-            "",
-            [
-              "Lambda function for auto-deleting objects in ",
-              {
-                "Ref": "CertificatesBucketE5F004DB",
-              },
-              " S3 bucket.",
-            ],
-          ],
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs24.x",
-        "Timeout": 900,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
     },
     "KeycloakEcrRepositoriesAwsCliBA060F4D": {
       "DeletionPolicy": "Delete",

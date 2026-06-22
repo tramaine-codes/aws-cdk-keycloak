@@ -381,7 +381,7 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
                   [
                     "s3://",
                     {
-                      "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputRefCertificatesBucketE5F004DBD9EB91C4",
+                      "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputRefKeycloakCertificatesBucketFF41C8EF4D55DAA6",
                     },
                   ],
                 ],
@@ -803,9 +803,111 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
     "KeycloakKeycloakTaskDefinitionLogGroup3A331D02": {
       "DeletionPolicy": "Delete",
       "Properties": {
+        "KmsKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakTaskDefinitionLogGroupKeyD33511C7",
+            "Arn",
+          ],
+        },
         "RetentionInDays": 7,
       },
       "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakKeycloakTaskDefinitionLogGroupKeyAliasEA8F8110": {
+      "Properties": {
+        "AliasName": "alias/keycloak/logs/keycloak-task",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakTaskDefinitionLogGroupKeyD33511C7",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "KeycloakKeycloakTaskDefinitionLogGroupKeyD33511C7": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:CancelKeyDeletion",
+                "kms:Create*",
+                "kms:DeleteAlias",
+                "kms:Describe*",
+                "kms:Disable*",
+                "kms:Enable*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
+                "kms:Tag*",
+                "kms:Untag*",
+                "kms:Update*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "KeyManagement",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:GenerateDataKey*",
+                "kms:ReEncrypt*",
+              ],
+              "Condition": {
+                "ArnLike": {
+                  "kms:EncryptionContext:aws:logs:arn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:us-east-1:000000000000:log-group:*",
+                      ],
+                    ],
+                  },
+                },
+                "StringEquals": {
+                  "kms:CallerAccount": "000000000000",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "logs.us-east-1.amazonaws.com",
+              },
+              "Resource": "*",
+              "Sid": "CloudWatchLogsAccess",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PendingWindowInDays": 7,
+      },
+      "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Delete",
     },
     "KeycloakKeycloakTaskDefinitionTaskRole743056A1": {
@@ -858,14 +960,14 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttCertificatesBucketE5F004DBArn598A74FC",
+                  "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakCertificatesBucketFF41C8EFArn72BF7B1C",
                 },
                 {
                   "Fn::Join": [
                     "",
                     [
                       {
-                        "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttCertificatesBucketE5F004DBArn598A74FC",
+                        "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakCertificatesBucketFF41C8EFArn72BF7B1C",
                       },
                       "/*",
                     ],
@@ -880,7 +982,7 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
               ],
               "Effect": "Allow",
               "Resource": {
-                "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttCertificatesBucketKey349C7E09Arn9325F448",
+                "Fn::ImportValue": "Keycloak-ArtifactsStack:ExportsOutputFnGetAttKeycloakCertificatesBucketKeyCA6DD9D0Arn72573CB1",
               },
             },
           ],

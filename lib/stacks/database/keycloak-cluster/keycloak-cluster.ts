@@ -4,8 +4,8 @@ import * as rds from 'aws-cdk-lib/aws-rds';
 import type * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import type { KeycloakFargateService } from '../../auth/keycloak/keycloak-ecs-cluster/keycloak-fargate-service.js';
 import { SecureDatabaseCluster } from '../../../constructs/rds/secure-database-cluster.js';
+import type { KeycloakFargateService } from '../../auth/keycloak/keycloak-ecs-cluster/keycloak-fargate-service.js';
 import type { KeycloakVpc } from '../../network/keycloak-vpc/keycloak-vpc.js';
 
 interface KeycloakClusterProps extends cdk.StackProps {
@@ -44,13 +44,13 @@ export class KeycloakCluster extends Construct {
     );
 
     this.cluster = new SecureDatabaseCluster(this, 'KeycloakCluster', {
-      alias: 'alias/keycloak/rds/keycloak-cluster',
       credentials: rds.Credentials.fromSecret(this.databaseSecret),
       defaultDatabaseName: 'keycloak',
       enableDataApi: true,
       engine: rds.DatabaseClusterEngine.auroraPostgres({
         version: rds.AuroraPostgresEngineVersion.VER_17_9,
       }),
+      keyAlias: 'alias/keycloak/rds/keycloak-cluster',
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       securityGroups: [this.clusterSecurityGroup],
       serverlessV2MaxCapacity: 1.0,

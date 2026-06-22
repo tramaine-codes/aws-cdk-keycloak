@@ -36,7 +36,7 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
         "IsMultiRegionTrail": false,
         "KMSKeyId": {
           "Fn::GetAtt": [
-            "AuditTrailKeyA4D56A7A",
+            "AuditTrailBucketKey8B8DD6D3",
             "Arn",
           ],
         },
@@ -49,7 +49,6 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
             "Value": "AuditTrail",
           },
         ],
-        "TrailName": "keycloak-audit",
       },
       "Type": "AWS::CloudTrail::Trail",
     },
@@ -72,7 +71,7 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
               "ServerSideEncryptionByDefault": {
                 "KMSMasterKeyID": {
                   "Fn::GetAtt": [
-                    "AuditTrailKeyA4D56A7A",
+                    "AuditTrailBucketKey8B8DD6D3",
                     "Arn",
                   ],
                 },
@@ -130,6 +129,123 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
       },
       "Type": "Custom::S3AutoDeleteObjects",
       "UpdateReplacePolicy": "Delete",
+    },
+    "AuditTrailBucketKey8B8DD6D3": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:CancelKeyDeletion",
+                "kms:Create*",
+                "kms:DeleteAlias",
+                "kms:Describe*",
+                "kms:Disable*",
+                "kms:Enable*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
+                "kms:Tag*",
+                "kms:Untag*",
+                "kms:Update*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "KeyManagement",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:GenerateDataKey*",
+                "kms:ReEncrypt*",
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "kms:CallerAccount": "000000000000",
+                  "kms:ViaService": "s3.us-east-1.amazonaws.com",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "AccountS3Access",
+            },
+            {
+              "Action": [
+                "kms:DescribeKey",
+                "kms:GenerateDataKey*",
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "kms:CallerAccount": "000000000000",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudtrail.amazonaws.com",
+              },
+              "Resource": "*",
+              "Sid": "CloudTrailConsumer",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PendingWindowInDays": 7,
+        "Tags": [
+          {
+            "Key": "keycloak:name",
+            "Value": "AuditTrailKey",
+          },
+        ],
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "AuditTrailBucketKeyAliasA7E8896B": {
+      "Properties": {
+        "AliasName": "alias/keycloak/cloud-trail/audit-trail",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "AuditTrailBucketKey8B8DD6D3",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
     },
     "AuditTrailBucketPolicy955F0D77": {
       "Properties": {
@@ -217,7 +333,7 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
                 "StringNotEqualsIfExists": {
                   "s3:x-amz-server-side-encryption-aws-kms-key-id": {
                     "Fn::GetAtt": [
-                      "AuditTrailKeyA4D56A7A",
+                      "AuditTrailBucketKey8B8DD6D3",
                       "Arn",
                     ],
                   },
@@ -290,7 +406,33 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
       },
       "Type": "AWS::S3::BucketPolicy",
     },
-    "AuditTrailKeyA4D56A7A": {
+    "AuditTrailLogGroup28BB9333": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "KmsKeyId": {
+          "Fn::GetAtt": [
+            "AuditTrailLogGroupKeyD84E6B74",
+            "Arn",
+          ],
+        },
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "AuditTrailLogGroupKeyAlias0738F4F5": {
+      "Properties": {
+        "AliasName": "alias/keycloak/logs/audit-trail",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "AuditTrailLogGroupKeyD84E6B74",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "AuditTrailLogGroupKeyD84E6B74": {
       "DeletionPolicy": "Delete",
       "Properties": {
         "EnableKeyRotation": true,
@@ -334,12 +476,15 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
             },
             {
               "Action": [
+                "kms:Decrypt",
                 "kms:DescribeKey",
+                "kms:Encrypt",
                 "kms:GenerateDataKey*",
+                "kms:ReEncrypt*",
               ],
               "Condition": {
-                "StringLike": {
-                  "kms:EncryptionContext:aws:cloudtrail:arn": {
+                "ArnLike": {
+                  "kms:EncryptionContext:aws:logs:arn": {
                     "Fn::Join": [
                       "",
                       [
@@ -347,81 +492,28 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
                         {
                           "Ref": "AWS::Partition",
                         },
-                        ":cloudtrail:*:000000000000:trail/*",
+                        ":logs:us-east-1:000000000000:log-group:*",
                       ],
                     ],
                   },
                 },
-              },
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "cloudtrail.amazonaws.com",
-              },
-              "Resource": "*",
-              "Sid": "CloudTrailConsumer",
-            },
-            {
-              "Action": [
-                "kms:Decrypt",
-                "kms:DescribeKey",
-                "kms:GenerateDataKey*",
-              ],
-              "Condition": {
                 "StringEquals": {
                   "kms:CallerAccount": "000000000000",
-                  "kms:ViaService": "s3.us-east-1.amazonaws.com",
                 },
               },
               "Effect": "Allow",
               "Principal": {
-                "AWS": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::000000000000:root",
-                    ],
-                  ],
-                },
+                "Service": "logs.us-east-1.amazonaws.com",
               },
               "Resource": "*",
-              "Sid": "S3DeliveryConsumer",
+              "Sid": "CloudWatchLogsAccess",
             },
           ],
           "Version": "2012-10-17",
         },
         "PendingWindowInDays": 7,
-        "Tags": [
-          {
-            "Key": "keycloak:name",
-            "Value": "AuditTrailKey",
-          },
-        ],
       },
       "Type": "AWS::KMS::Key",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "AuditTrailKeyAliasD4F9B94C": {
-      "Properties": {
-        "AliasName": "alias/keycloak/cloud-trail/audit-trail",
-        "TargetKeyId": {
-          "Fn::GetAtt": [
-            "AuditTrailKeyA4D56A7A",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::KMS::Alias",
-    },
-    "AuditTrailLogGroup28BB9333": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "RetentionInDays": 7,
-      },
-      "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Delete",
     },
     "AuditTrailLogsRoleC3960E54": {
@@ -491,7 +583,7 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
             [
               "Lambda function for auto-deleting objects in ",
               {
-                "Ref": "AuditTrailBucketA91FD435",
+                "Ref": "FlowLogsBucket87F67F60",
               },
               " S3 bucket.",
             ],
@@ -549,7 +641,13 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
           "ServerSideEncryptionConfiguration": [
             {
               "ServerSideEncryptionByDefault": {
-                "SSEAlgorithm": "AES256",
+                "KMSMasterKeyID": {
+                  "Fn::GetAtt": [
+                    "FlowLogsBucketKey65064167",
+                    "Arn",
+                  ],
+                },
+                "SSEAlgorithm": "aws:kms",
               },
             },
           ],
@@ -603,6 +701,118 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
       },
       "Type": "Custom::S3AutoDeleteObjects",
       "UpdateReplacePolicy": "Delete",
+    },
+    "FlowLogsBucketKey65064167": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:CancelKeyDeletion",
+                "kms:Create*",
+                "kms:DeleteAlias",
+                "kms:Describe*",
+                "kms:Disable*",
+                "kms:Enable*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
+                "kms:Tag*",
+                "kms:Untag*",
+                "kms:Update*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "KeyManagement",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:GenerateDataKey*",
+                "kms:ReEncrypt*",
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "kms:CallerAccount": "000000000000",
+                  "kms:ViaService": "s3.us-east-1.amazonaws.com",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "AccountS3Access",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:GenerateDataKey*",
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "aws:SourceAccount": "000000000000",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "delivery.logs.amazonaws.com",
+              },
+              "Resource": "*",
+              "Sid": "FlowLogsDelivery",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PendingWindowInDays": 7,
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "FlowLogsBucketKeyAliasEBDA5F30": {
+      "Properties": {
+        "AliasName": "alias/keycloak/s3/flow-logs",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "FlowLogsBucketKey65064167",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
     },
     "FlowLogsBucketPolicy2108052C": {
       "Properties": {

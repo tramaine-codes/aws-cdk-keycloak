@@ -14,7 +14,7 @@ export interface SecureBucketProps
     | 'enforceSSL'
     | 'versioned'
   > {
-  readonly alias: string;
+  readonly keyAlias: string;
   readonly serverAccessLogsBucket: s3.IBucket;
 }
 
@@ -22,7 +22,7 @@ export class SecureBucket extends s3.Bucket {
   override readonly encryptionKey: kms.IKey;
 
   constructor(scope: Construct, id: string, props: SecureBucketProps) {
-    const { alias, ...bucketProps } = props;
+    const { keyAlias: alias, ...bucketProps } = props;
 
     const encryptionKey = new SecureKey(scope, `${id}Key`, { alias });
 
@@ -39,7 +39,7 @@ export class SecureBucket extends s3.Bucket {
 
     this.encryptionKey = encryptionKey;
 
-    const stack = cdk.Stack.of(this);
+    const { account, region } = cdk.Stack.of(this);
 
     encryptionKey.addToResourcePolicy(
       new iam.PolicyStatement({
@@ -53,8 +53,8 @@ export class SecureBucket extends s3.Bucket {
         ],
         conditions: {
           StringEquals: {
-            'kms:CallerAccount': stack.account,
-            'kms:ViaService': `s3.${stack.region}.amazonaws.com`,
+            'kms:CallerAccount': account,
+            'kms:ViaService': `s3.${region}.amazonaws.com`,
           },
         },
         principals: [new iam.AccountRootPrincipal()],
@@ -79,14 +79,16 @@ export class SecureBucket extends s3.Bucket {
   }
 
   grantConsumer = (principal: iam.IPrincipal) => {
+    const { account, region } = cdk.Stack.of(this);
+
     this.encryptionKey.addToResourcePolicy(
       new iam.PolicyStatement({
         sid: 'S3Consumer',
         actions: ['kms:Decrypt', 'kms:DescribeKey', 'kms:GenerateDataKey*'],
         conditions: {
           StringEquals: {
-            'kms:CallerAccount': cdk.Stack.of(this).account,
-            'kms:ViaService': `s3.${cdk.Stack.of(this).region}.amazonaws.com`,
+            'kms:CallerAccount': account,
+            'kms:ViaService': `s3.${region}.amazonaws.com`,
           },
         },
         principals: [principal],
