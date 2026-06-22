@@ -360,6 +360,7 @@ exports[`LoggingStack > composition matches snapshot 1`] = `
                   ],
                 ],
               },
+              "Sid": "DenyIncorrectEncryptionKey",
             },
             {
               "Action": "s3:GetBucketAcl",

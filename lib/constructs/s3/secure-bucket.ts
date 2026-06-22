@@ -64,6 +64,7 @@ export class SecureBucket extends s3.Bucket {
 
     this.addToResourcePolicy(
       new iam.PolicyStatement({
+        sid: 'DenyIncorrectEncryptionKey',
         actions: ['s3:PutObject'],
         conditions: {
           StringNotEqualsIfExists: {

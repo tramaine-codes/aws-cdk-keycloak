@@ -32,6 +32,7 @@ export class AuditTrail extends Construct {
 
     bucket.addToResourcePolicy(
       new iam.PolicyStatement({
+        sid: 'DenyIncorrectEncryptionKey',
         actions: ['s3:PutObject'],
         conditions: {
           StringNotEqualsIfExists: {

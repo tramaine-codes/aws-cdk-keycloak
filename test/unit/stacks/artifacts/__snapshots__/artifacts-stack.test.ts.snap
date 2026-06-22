@@ -336,6 +336,7 @@ exports[`ArtifactsStack > composition matches snapshot 1`] = `
                   ],
                 ],
               },
+              "Sid": "DenyIncorrectEncryptionKey",
             },
           ],
           "Version": "2012-10-17",
