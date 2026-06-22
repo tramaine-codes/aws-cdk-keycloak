@@ -116,12 +116,13 @@ test/
 
 ## CDK Stacks
 
-| Stack                          | Description                                       |
-| ------------------------------ | ------------------------------------------------- |
-| `Keycloak-NetworkStack`        | VPC and subnet infrastructure                     |
-| `Keycloak-DatabaseStack`       | Aurora PostgreSQL Serverless v2 cluster           |
-| `Keycloak-ArtifactsStack`      | TLS certificate bucket and ECR image repositories |
-| `Keycloak-AuthenticationStack` | ECS Fargate service, NLB, ECS cluster             |
+| Stack                          | Description                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------ |
+| `Keycloak-LoggingStack`        | CloudTrail audit trail, VPC flow logs bucket, and S3 server access logs bucket |
+| `Keycloak-NetworkStack`        | VPC and subnet infrastructure                                                  |
+| `Keycloak-DatabaseStack`       | Aurora PostgreSQL Serverless v2 cluster                                        |
+| `Keycloak-ArtifactsStack`      | TLS certificate bucket and ECR image repositories                              |
+| `Keycloak-AuthenticationStack` | ECS Fargate service, NLB, ECS cluster                                          |
 
 ### Deployment
 
@@ -140,7 +141,7 @@ npx cdk bootstrap
 **3. Deploy the prerequisites**
 
 ```bash
-npx cdk deploy Keycloak-NetworkStack Keycloak-DatabaseStack Keycloak-ArtifactsStack --require-approval never
+npx cdk deploy Keycloak-LoggingStack Keycloak-NetworkStack Keycloak-DatabaseStack Keycloak-ArtifactsStack --require-approval never
 ```
 
 **4. Upload TLS certificates to S3**
