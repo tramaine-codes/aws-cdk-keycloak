@@ -9,20 +9,20 @@
     "aws-cdk-keycloak": "bin/aws-cdk-keycloak.js"
   },
   "dependencies": {
-    "@aws-sdk/client-ecr": "3.1074.0",
-    "@aws-sdk/client-s3": "3.1074.0",
-    "@aws-sdk/credential-providers": "3.1074.0",
-    "@aws-sdk/lib-storage": "3.1074.0",
+    "@aws-sdk/client-ecr": "3.1075.0",
+    "@aws-sdk/client-s3": "3.1075.0",
+    "@aws-sdk/credential-providers": "3.1075.0",
+    "@aws-sdk/lib-storage": "3.1075.0",
     "aws-cdk-lib": "2.260.0",
     "constructs": "10.6.0",
-    "effect": "4.0.0-beta.84",
+    "effect": "4.0.0-beta.87",
     "package-directory": "8.2.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.0",
+    "@biomejs/biome": "2.5.1",
     "@changesets/cli": "2.31.0",
-    "@commitlint/cli": "21.0.2",
-    "@commitlint/config-conventional": "21.0.2",
+    "@commitlint/cli": "21.1.0",
+    "@commitlint/config-conventional": "21.1.0",
     "@types/node": "24.13.2",
     "@vitest/coverage-v8": "4.1.9",
     "aws-cdk": "2.1128.1",
@@ -37,7 +37,7 @@
     "vitest": "4.1.9"
   },
   "engines": {
-    "node": "24.17.0",
+    "node": "24.18.0",
     "npm": "11.17.0"
   },
   "homepage": "https://github.com/tramaine-codes/aws-cdk-keycloak",
@@ -68,7 +68,7 @@
   "type": "module",
   "version": "0.1.0",
   "volta": {
-    "node": "24.17.0",
+    "node": "24.18.0",
     "npm": "11.17.0"
   }
 }
