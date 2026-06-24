@@ -5,7 +5,7 @@ import type { Construct } from 'constructs';
 import { SecureKey } from '../kms/secure-key.js';
 
 export interface SecureLogGroupProps
-  extends Omit<logs.LogGroupProps, 'encryptionKey' | 'removalPolicy'> {
+  extends Omit<logs.LogGroupProps, 'encryptionKey'> {
   readonly keyAlias: string;
 }
 
@@ -16,9 +16,9 @@ export class SecureLogGroup extends logs.LogGroup {
 
     super(scope, id, {
       retention: logs.RetentionDays.ONE_WEEK,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
       ...logGroupProps,
       encryptionKey,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     const { account, partition, region } = cdk.Stack.of(this);
