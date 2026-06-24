@@ -21,6 +21,125 @@ exports[`AuthenticationStack > composition matches snapshot 1`] = `
       },
       "Type": "AWS::ECS::Cluster",
     },
+    "KeycloakKeycloakEcsClusterInsightsLogGroup8D9B03F4": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "KmsKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakEcsClusterInsightsLogGroupKeyC2FC1B25",
+            "Arn",
+          ],
+        },
+        "LogGroupName": {
+          "Fn::Join": [
+            "",
+            [
+              "/aws/ecs/containerinsights/",
+              {
+                "Ref": "KeycloakKeycloakEcsCluster8BC4A434",
+              },
+              "/performance",
+            ],
+          ],
+        },
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "KeycloakKeycloakEcsClusterInsightsLogGroupKeyAlias810BEE72": {
+      "Properties": {
+        "AliasName": "alias/keycloak/logs/container-insights",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "KeycloakKeycloakEcsClusterInsightsLogGroupKeyC2FC1B25",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "KeycloakKeycloakEcsClusterInsightsLogGroupKeyC2FC1B25": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:CancelKeyDeletion",
+                "kms:Create*",
+                "kms:DeleteAlias",
+                "kms:Describe*",
+                "kms:Disable*",
+                "kms:Enable*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Revoke*",
+                "kms:RotateKeyOnDemand",
+                "kms:ScheduleKeyDeletion",
+                "kms:Tag*",
+                "kms:Untag*",
+                "kms:Update*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::000000000000:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "KeyManagement",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:GenerateDataKey*",
+                "kms:ReEncrypt*",
+              ],
+              "Condition": {
+                "ArnLike": {
+                  "kms:EncryptionContext:aws:logs:arn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:us-east-1:000000000000:log-group:*",
+                      ],
+                    ],
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "logs.us-east-1.amazonaws.com",
+              },
+              "Resource": "*",
+              "Sid": "CloudWatchLogsAccess",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PendingWindowInDays": 7,
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Delete",
+    },
     "KeycloakKeycloakFargateService3AF17172": {
       "DependsOn": [
         "KeycloakKeycloakNlbListenerKeycloakTargetGroup17D85338",
